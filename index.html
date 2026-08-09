@@ -18,33 +18,12 @@ body{font-family:'Yu Gothic UI','Hiragino Sans','Meiryo',sans-serif;
 
 /* ===== HERO ===== */
 .hero{position:relative;height:56vh;min-height:340px;max-height:560px;overflow:hidden;
-  background:linear-gradient(180deg,#0a0a2e 0%,#1a0d3a 45%,#2a1050 75%,#3a1560 100%)}
+  background:#0a0a1a}
 
-.stars{position:absolute;inset:0}
-.star{position:absolute;background:#fff;border-radius:50%;animation:twinkle 3s ease-in-out infinite}
-@keyframes twinkle{0%,100%{opacity:.2}50%{opacity:1}}
+.hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
 
-.moon{position:absolute;top:8%;right:10%;width:70px;height:70px;border-radius:50%;
-  background:radial-gradient(circle at 35% 35%, #FFF8DC, var(--gold));
-  box-shadow:0 0 40px 10px rgba(245,166,35,.35)}
-
-.mountains{position:absolute;bottom:0;left:0;width:100%;height:35%;
-  background:linear-gradient(180deg, transparent 0%, #0a0a1a 100%)}
-.mountains svg{position:absolute;bottom:-2px;width:100%;height:100%}
-
-.dragon{position:absolute;top:30%;left:-160px;font-size:70px;
-  filter:drop-shadow(0 0 18px rgba(233,69,96,.5));
-  animation:fly 16s linear infinite;
-  transform:scaleX(-1)}
-@keyframes fly{
-  0%{left:-160px;top:38%;transform:scaleX(-1) rotate(-4deg) translateY(0)}
-  25%{top:18%;transform:scaleX(-1) rotate(3deg) translateY(-10px)}
-  50%{top:32%;transform:scaleX(-1) rotate(-3deg) translateY(6px)}
-  75%{top:14%;transform:scaleX(-1) rotate(4deg) translateY(-14px)}
-  100%{left:110%;top:26%;transform:scaleX(-1) rotate(-2deg) translateY(0)}
-}
-.dragon .wing{display:inline-block;animation:flap .5s ease-in-out infinite}
-@keyframes flap{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.7)}}
+.hero-scrim{position:absolute;inset:0;z-index:2;
+  background:linear-gradient(180deg, rgba(8,8,20,.55) 0%, rgba(8,8,20,.25) 35%, rgba(8,8,20,.35) 65%, rgba(8,8,20,.85) 100%)}
 
 .hero-content{position:relative;z-index:5;height:100%;display:flex;flex-direction:column;
   align-items:center;justify-content:center;text-align:center;padding:0 16px}
@@ -88,14 +67,10 @@ footer{text-align:center;font-size:10.5px;color:#555570;padding:20px}
 
 <div class="hero">
   <button class="sound-toggle" id="soundToggle">🔇 BGM: OFF</button>
-  <div class="stars" id="stars"></div>
-  <div class="moon"></div>
-  <div class="dragon" id="dragon">🐉</div>
-  <div class="mountains">
-    <svg viewBox="0 0 1200 200" preserveAspectRatio="none">
-      <polygon points="0,200 0,120 200,40 400,130 600,60 800,140 1000,50 1200,110 1200,200" fill="#0a0a1a"/>
-    </svg>
-  </div>
+  <video class="hero-video" autoplay muted loop playsinline>
+    <source src="assets/dragon.mp4" type="video/mp4">
+  </video>
+  <div class="hero-scrim"></div>
   <div class="hero-content">
     <div class="hero-title">LOVEQUEST MASTERS</div>
     <div class="hero-sub">恋愛式学 × RPG冒険譚</div>
@@ -167,20 +142,6 @@ footer{text-align:center;font-size:10.5px;color:#555570;padding:20px}
 <footer>LOVEQUEST MASTERS — 恋愛式学(ジョニー式) × RPGコミュニティ</footer>
 
 <script>
-// 星を散りばめる
-const starsEl = document.getElementById('stars');
-for(let i=0;i<60;i++){
-  const s = document.createElement('div');
-  s.className = 'star';
-  const size = Math.random()*2 + 1;
-  s.style.width = size+'px';
-  s.style.height = size+'px';
-  s.style.left = Math.random()*100+'%';
-  s.style.top = Math.random()*70+'%';
-  s.style.animationDelay = (Math.random()*3)+'s';
-  starsEl.appendChild(s);
-}
-
 // BGM トグル(デフォルトミュート)
 const bgm = document.getElementById('bgm');
 const toggle = document.getElementById('soundToggle');
