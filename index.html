@@ -4,391 +4,203 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>LOVEQUEST MASTERS | RPGダッシュボード</title>
+<title>LOVEQUEST MASTERS</title>
 <style>
 :root{
-  --bg:#0D0D1A; --card:#1A1A35; --card2:#12122A;
+  --bg:#080814; --card:#1A1A35; --card2:#12122A;
   --gold:#F5A623; --red:#E94560; --blue:#4A9EDB;
   --green:#4CAF73; --purple:#7B5EA7;
   --white:#FFFFFF; --light:#E0E0E0; --muted:#8888AA;
-  --se:#E94560; --od:#F5A623; --so:#4CAF73; --ma:#4A9EDB;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Yu Gothic UI','Hiragino Sans','Meiryo',sans-serif;
-  background:var(--bg);color:var(--light);min-height:100vh;overflow-x:hidden}
+  background:var(--bg);color:var(--light)}
 
-/* ─── MODAL ─── */
-#modal{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:100;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px}
-#modal h2{color:var(--gold);font-size:22px;margin-bottom:4px;text-align:center}
-#modal p{color:var(--muted);font-size:13px;margin-bottom:18px;text-align:center}
-.av-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:560px;width:100%}
-.av-card{background:var(--card);border:1.5px solid #333;border-radius:10px;
-  padding:10px 6px;text-align:center;cursor:pointer;transition:.15s}
-.av-card:hover{transform:translateY(-3px);border-color:var(--gold)}
-.av-card .av-icon{font-size:28px;line-height:1.1}
-.av-card .av-name{font-size:11px;font-weight:700;margin-top:5px;color:var(--white)}
-.av-card.se{border-color:#333} .av-card.se:hover{border-color:var(--se)}
-.av-card.od{border-color:#333} .av-card.od:hover{border-color:var(--od)}
-.av-card.so{border-color:#333} .av-card.so:hover{border-color:var(--so)}
-.av-card.ma{border-color:#333} .av-card.ma:hover{border-color:var(--ma)}
+/* ===== HERO ===== */
+.hero{position:relative;height:56vh;min-height:340px;max-height:560px;overflow:hidden;
+  background:linear-gradient(180deg,#0a0a2e 0%,#1a0d3a 45%,#2a1050 75%,#3a1560 100%)}
 
-/* ─── HEADER ─── */
-header{background:linear-gradient(135deg,#0D0D1A 0%,#1A0D2E 100%);
-  border-bottom:1px solid #2a2a4a;padding:10px 16px;
-  display:flex;align-items:center;justify-content:space-between}
-.logo{font-size:18px;font-weight:900;letter-spacing:2px;color:var(--gold)}
-.logo span{color:var(--white)}
-.hdr-right{display:flex;gap:8px;align-items:center}
-.demo-btn{font-size:11px;padding:5px 10px;border-radius:8px;
-  border:1px solid var(--purple);background:transparent;color:var(--purple);cursor:pointer}
-.demo-btn:hover{background:var(--purple);color:var(--white)}
-.reset-btn{font-size:11px;padding:5px 10px;border-radius:8px;
-  border:1px solid #444;background:transparent;color:var(--muted);cursor:pointer}
-.reset-btn:hover{background:#333;color:var(--white)}
+.stars{position:absolute;inset:0}
+.star{position:absolute;background:#fff;border-radius:50%;animation:twinkle 3s ease-in-out infinite}
+@keyframes twinkle{0%,100%{opacity:.2}50%{opacity:1}}
 
-/* ─── LAYOUT ─── */
-main{display:grid;grid-template-columns:220px 1fr 280px;gap:12px;
-  padding:12px;max-width:1100px;margin:0 auto}
-@media(max-width:860px){main{grid-template-columns:1fr 1fr}
-  #quest-panel{grid-column:1/-1}}
-@media(max-width:540px){main{grid-template-columns:1fr}
-  #quest-panel{grid-column:auto}}
+.moon{position:absolute;top:8%;right:10%;width:70px;height:70px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%, #FFF8DC, var(--gold));
+  box-shadow:0 0 40px 10px rgba(245,166,35,.35)}
 
-/* ─── PANEL ─── */
-.panel{background:var(--card);border:1px solid #2a2a4a;border-radius:14px;
-  padding:14px;align-self:start}
+.mountains{position:absolute;bottom:0;left:0;width:100%;height:35%;
+  background:linear-gradient(180deg, transparent 0%, #0a0a1a 100%)}
+.mountains svg{position:absolute;bottom:-2px;width:100%;height:100%}
 
-/* ─── AVATAR PANEL ─── */
-#avatar-panel{text-align:center}
-.av-display{font-size:62px;line-height:1;margin:8px 0}
-.av-title{font-size:16px;font-weight:900;color:var(--gold)}
-.av-sub{font-size:11px;color:var(--muted);margin-top:2px}
-.change-btn{font-size:11px;padding:4px 10px;border-radius:8px;margin-top:8px;
-  border:1px solid #444;background:transparent;color:var(--muted);cursor:pointer}
-.change-btn:hover{border-color:var(--gold);color:var(--gold)}
-.overall-box{margin-top:12px;background:var(--card2);border-radius:10px;padding:10px 12px;
-  border:1px solid #2a2a4a}
-.overall-lbl{font-size:11px;color:var(--muted);text-align:left}
-.overall-lv{font-size:28px;font-weight:900;color:var(--gold);text-align:left;line-height:1.1}
-.overall-title{font-size:12px;color:var(--muted);text-align:left;margin-bottom:6px}
-.xp-bar-bg{height:8px;background:#2a2a4a;border-radius:4px;overflow:hidden;margin-top:6px}
-.xp-bar-fill{height:100%;border-radius:4px;background:var(--purple);transition:width .5s ease}
-.xp-txt{font-size:10px;color:var(--muted);margin-top:3px;text-align:right}
+.dragon{position:absolute;top:30%;left:-160px;font-size:70px;
+  filter:drop-shadow(0 0 18px rgba(233,69,96,.5));
+  animation:fly 16s linear infinite;
+  transform:scaleX(-1)}
+@keyframes fly{
+  0%{left:-160px;top:38%;transform:scaleX(-1) rotate(-4deg) translateY(0)}
+  25%{top:18%;transform:scaleX(-1) rotate(3deg) translateY(-10px)}
+  50%{top:32%;transform:scaleX(-1) rotate(-3deg) translateY(6px)}
+  75%{top:14%;transform:scaleX(-1) rotate(4deg) translateY(-14px)}
+  100%{left:110%;top:26%;transform:scaleX(-1) rotate(-2deg) translateY(0)}
+}
+.dragon .wing{display:inline-block;animation:flap .5s ease-in-out infinite}
+@keyframes flap{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.7)}}
 
-/* ─── STATS ─── */
-#stats-panel h3{font-size:13px;font-weight:700;color:var(--white);margin-bottom:12px}
-.stat-row{margin-bottom:14px}
-.stat-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
-.stat-name{font-size:12.5px;color:var(--light)}
-.stat-lv{font-size:12px;font-weight:700}
-.stat-bar-bg{height:12px;background:#2a2a4a;border-radius:6px;overflow:hidden}
-.stat-bar-fill{height:100%;border-radius:6px;transition:width .5s ease}
-.stat-adj{display:flex;gap:4px;margin-top:5px;justify-content:flex-end}
-.adj-btn{font-size:10px;padding:2px 7px;border-radius:5px;border:1px solid #444;
-  background:transparent;color:var(--muted);cursor:pointer;transition:.1s}
-.adj-btn:hover{background:#333;color:var(--white)}
-.stat-desc{font-size:10px;color:var(--muted);margin-top:2px}
+.hero-content{position:relative;z-index:5;height:100%;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;padding:0 16px}
+.hero-title{font-size:clamp(30px,7vw,54px);font-weight:900;color:var(--gold);
+  letter-spacing:2px;text-shadow:0 0 24px rgba(245,166,35,.5)}
+.hero-sub{font-size:13px;color:var(--muted);margin-top:10px;letter-spacing:3px}
+.hero-tagline{font-size:12.5px;color:var(--light);margin-top:16px;max-width:480px;line-height:1.8}
 
-/* ─── QUESTS ─── */
-#quest-panel h3{font-size:13px;font-weight:700;color:var(--white);margin-bottom:10px}
-.q-item{display:flex;align-items:flex-start;gap:10px;padding:9px 10px;
-  border-radius:9px;margin-bottom:6px;cursor:pointer;
-  border:1px solid #2a2a4a;background:var(--card2);transition:.15s}
-.q-item:hover{border-color:#444}
-.q-item.done{background:#0D1F0D;border-color:var(--green)}
-.q-icon{font-size:18px;line-height:1;flex-shrink:0;margin-top:1px}
-.q-body{flex:1;min-width:0}
-.q-name{font-size:12.5px;font-weight:700;color:var(--light)}
-.q-item.done .q-name{color:var(--green)}
-.q-desc{font-size:10.5px;color:var(--muted);margin-top:2px}
-.q-reward{font-size:10px;color:#888;margin-top:3px}
-.q-check{font-size:18px;flex-shrink:0;margin-top:1px}
-.q-item.done .q-check::before{content:'✅'}
-.q-item:not(.done) .q-check::before{content:'⬜'}
+.sound-toggle{position:absolute;top:16px;right:16px;z-index:10;
+  background:rgba(18,18,42,.7);border:1px solid #3a3a5a;border-radius:20px;
+  padding:8px 16px;font-size:12px;color:var(--light);cursor:pointer;
+  display:flex;align-items:center;gap:6px;backdrop-filter:blur(4px)}
+.sound-toggle:hover{border-color:var(--gold)}
 
-/* ─── TOAST ─── */
-#toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.8);
-  background:linear-gradient(135deg,#1A0D35,#2A1A55);
-  border:2px solid var(--gold);border-radius:16px;padding:28px 40px;
-  text-align:center;z-index:200;opacity:0;pointer-events:none;transition:.3s}
-#toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
-#toast .t-icon{font-size:48px}
-#toast .t-title{font-size:22px;font-weight:900;color:var(--gold);margin:8px 0 4px}
-#toast .t-sub{font-size:14px;color:var(--light)}
+.scroll-hint{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);
+  font-size:11px;color:var(--muted);z-index:5;animation:bob 1.8s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,6px)}}
+
+/* ===== TOOLS GRID ===== */
+.wrap{max-width:880px;margin:0 auto;padding:36px 16px 60px}
+.section-title{font-size:18px;font-weight:900;color:var(--white);text-align:center;margin-bottom:6px}
+.section-sub{font-size:11.5px;color:var(--muted);text-align:center;margin-bottom:26px}
+
+.tool-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.tool-card{background:var(--card);border:1px solid #2a2a4a;border-radius:16px;padding:18px;
+  text-decoration:none;color:var(--light);display:flex;flex-direction:column;gap:8px;
+  transition:.15s}
+.tool-card:hover{border-color:var(--gold);transform:translateY(-2px)}
+.tool-card .tc-icon{font-size:30px}
+.tool-card .tc-title{font-size:14px;font-weight:900;color:var(--white)}
+.tool-card .tc-desc{font-size:11.5px;color:var(--muted);line-height:1.6}
+.tool-card .tc-tag{align-self:flex-start;font-size:9.5px;padding:2px 9px;border-radius:10px;
+  margin-top:4px}
+.tag-live{background:#0D1F0D;color:var(--green);border:1px solid var(--green)}
+.tag-doc{background:#1A1A35;color:var(--blue);border:1px solid var(--blue)}
+
+footer{text-align:center;font-size:10.5px;color:#555570;padding:20px}
 </style>
 </head>
 <body>
 
-<!-- Avatar Selection Modal -->
-<div id="modal">
-  <h2>⚔️ アバターを選択してください</h2>
-  <p>あなたの恋愛スタイルに近いキャラクターを選んで冒険を始めましょう</p>
-  <div class="av-grid" id="av-grid"></div>
+<div class="hero">
+  <button class="sound-toggle" id="soundToggle">🔇 BGM: OFF</button>
+  <div class="stars" id="stars"></div>
+  <div class="moon"></div>
+  <div class="dragon" id="dragon">🐉</div>
+  <div class="mountains">
+    <svg viewBox="0 0 1200 200" preserveAspectRatio="none">
+      <polygon points="0,200 0,120 200,40 400,130 600,60 800,140 1000,50 1200,110 1200,200" fill="#0a0a1a"/>
+    </svg>
+  </div>
+  <div class="hero-content">
+    <div class="hero-title">LOVEQUEST MASTERS</div>
+    <div class="hero-sub">恋愛式学 × RPG冒険譚</div>
+    <div class="hero-tagline">タイプを見極め、仲間を集め、己の恋愛譚を切り拓け。<br>ここに揃うのは、あなたの冒険を導く7つのツールだ。</div>
+  </div>
+  <div class="scroll-hint">↓ scroll</div>
 </div>
 
-<!-- Header -->
-<header>
-  <div class="logo">LOVE<span>QUEST</span> <span style="font-size:12px;color:var(--muted)">MASTERS</span></div>
-  <div class="hdr-right">
-    <button class="demo-btn" onclick="loadDemo()">⚡ デモデータ</button>
-    <button class="reset-btn" onclick="resetAll()">🔄 リセット</button>
-  </div>
-</header>
+<audio id="bgm" loop preload="none">
+  <source src="assets/bgm.mp3" type="audio/mpeg">
+</audio>
 
-<!-- Main -->
-<main>
-  <!-- Avatar Panel -->
-  <div class="panel" id="avatar-panel">
-    <div class="av-display" id="av-icon">🧙</div>
-    <div class="av-title" id="av-name">魔法戦士</div>
-    <div class="av-sub" id="av-sub">戦士 × 魔法使い</div>
-    <button class="change-btn" onclick="openModal()">✏️ 変更</button>
-    <div class="overall-box">
-      <div class="overall-lbl">総合レベル</div>
-      <div class="overall-lv" id="ov-lv">Lv.1</div>
-      <div class="overall-title" id="ov-rank">見習い冒険者</div>
-      <div class="xp-bar-bg"><div class="xp-bar-fill" id="xp-bar" style="width:0%"></div></div>
-      <div class="xp-txt" id="xp-txt">0 / 100 XP</div>
-    </div>
-  </div>
+<div class="wrap">
+  <div class="section-title">🗺️ 冒険の書（ツール一覧）</div>
+  <div class="section-sub">気になるものから開いてみよう</div>
 
-  <!-- Stats Panel -->
-  <div class="panel" id="stats-panel">
-    <h3>📊 ステータス</h3>
-    <div id="stats-container"></div>
-  </div>
+  <div class="tool-grid">
+    <a class="tool-card" href="dashboard.html">
+      <div class="tc-icon">⚔️</div>
+      <div class="tc-title">RPGダッシュボード</div>
+      <div class="tc-desc">アバター・ステータス・クエストのUIモック</div>
+      <div class="tc-tag tag-doc">モック</div>
+    </a>
 
-  <!-- Quest Panel -->
-  <div class="panel" id="quest-panel">
-    <h3>⚔️ クエスト <span id="q-count" style="font-size:11px;color:var(--muted);font-weight:400"></span></h3>
-    <div id="quest-container"></div>
-  </div>
-</main>
+    <a class="tool-card" href="player_encyclopedia.html">
+      <div class="tc-icon">📖</div>
+      <div class="tc-title">プレイヤー図鑑</div>
+      <div class="tc-desc">16タイプ×256通りの相性を自動計算</div>
+      <div class="tc-tag tag-live">稼働中</div>
+    </a>
 
-<!-- Level Up Toast -->
-<div id="toast">
-  <div class="t-icon">🌟</div>
-  <div class="t-title" id="toast-title">LEVEL UP!</div>
-  <div class="t-sub" id="toast-sub">Lv.2 に上がりました</div>
+    <a class="tool-card" href="type_diagnosis_flowchart.html">
+      <div class="tc-icon">🧭</div>
+      <div class="tc-title">タイプ診断フローチャート</div>
+      <div class="tc-desc">3ステップで写真からタイプを絞り込む</div>
+      <div class="tc-tag tag-live">稼働中</div>
+    </a>
+
+    <a class="tool-card" href="compatibility_library.html">
+      <div class="tc-icon">📚</div>
+      <div class="tc-title">相性ライブラリ</div>
+      <div class="tc-desc">ジョニー執筆・本物の相性解説125通り以上</div>
+      <div class="tc-tag tag-live">稼働中</div>
+    </a>
+
+    <a class="tool-card" href="https://ai-johnny-backend.vercel.app" target="_blank">
+      <div class="tc-icon">🧠</div>
+      <div class="tc-title">AIジョニー</div>
+      <div class="tc-desc">写真・動画・テキストをAIが実際に診断</div>
+      <div class="tc-tag tag-live">稼働中</div>
+    </a>
+
+    <a class="tool-card" href="proposal.pdf" target="_blank">
+      <div class="tc-icon">📄</div>
+      <div class="tc-title">構築提案書</div>
+      <div class="tc-desc">プロジェクト全体の企画・費用プラン</div>
+      <div class="tc-tag tag-doc">資料</div>
+    </a>
+
+    <a class="tool-card" href="character_design_brief_16types.md" target="_blank">
+      <div class="tc-icon">🎨</div>
+      <div class="tc-title">キャラデザインブリーフ</div>
+      <div class="tc-desc">16タイプ分のイラスト発注仕様書</div>
+      <div class="tc-tag tag-doc">資料</div>
+    </a>
+  </div>
 </div>
+
+<footer>LOVEQUEST MASTERS — 恋愛式学(ジョニー式) × RPGコミュニティ</footer>
 
 <script>
-// ─── DATA ───────────────────────────────────────────
-const AVATARS = [
-  {name:'狂戦士',icon:'⚔️',type:'se',sub:'戦士ド直球'},
-  {name:'勇者',  icon:'🦸',type:'se',sub:'戦士 × 踊り子'},
-  {name:'魔法戦士',icon:'🧙',type:'se',sub:'戦士 × 魔法使い'},
-  {name:'聖戦士',icon:'🛡️',type:'se',sub:'戦士 × 僧侶'},
-  {name:'姫',   icon:'👸',type:'od',sub:'踊り子ド直球'},
-  {name:'騎士',  icon:'🏇',type:'od',sub:'踊り子 × 戦士'},
-  {name:'盗賊',  icon:'🗡️',type:'od',sub:'踊り子 × 魔法使い'},
-  {name:'妖精',  icon:'🧚',type:'od',sub:'踊り子 × 僧侶'},
-  {name:'シスター',icon:'🌿',type:'so',sub:'僧侶ド直球'},
-  {name:'兵士',  icon:'🪖',type:'so',sub:'僧侶 × 戦士'},
-  {name:'牧師',  icon:'📖',type:'so',sub:'僧侶 × 踊り子'},
-  {name:'賢者',  icon:'🦉',type:'so',sub:'僧侶 × 魔法使い'},
-  {name:'魔道士',icon:'🔮',type:'ma',sub:'魔法使いド直球'},
-  {name:'忍者',  icon:'🥷',type:'ma',sub:'魔法使い × 戦士'},
-  {name:'道化師',icon:'🎭',type:'ma',sub:'魔法使い × 踊り子'},
-  {name:'占い師',icon:'⭐',type:'ma',sub:'魔法使い × 僧侶'},
-];
-
-const STATS = [
-  {key:'外見力', icon:'✨', color:'#E94560', desc:'ファッション・清潔感・雰囲気'},
-  {key:'デート力',icon:'🗺️',color:'#F5A623', desc:'デート企画・場の演出力'},
-  {key:'魅了力', icon:'💫', color:'#7B5EA7', desc:'会話・印象・トキメキを生む力'},
-  {key:'コミュ力',icon:'💬',color:'#4CAF73', desc:'タイプ読み・共感・アプローチ'},
-];
-
-const QUESTS = [
-  {name:'タイプ診断マスター',   desc:'恋愛式学16タイプを理解する', icon:'🔮',xp:100, reward:{コミュ力:15,魅了力:10}},
-  {name:'プロフィール写真改善', desc:'外見力基礎講座を完了',        icon:'📸',xp:80,  reward:{外見力:20}},
-  {name:'外見力 Lv.3 達成',    desc:'外見スコア30以上を達成',       icon:'✨',xp:120, reward:{外見力:10,魅了力:5}},
-  {name:'マッチングアプリ登録', desc:'アプリを始める第一歩',         icon:'📱',xp:50,  reward:{コミュ力:10}},
-  {name:'初メッセージ送信',    desc:'相手にメッセージを送る',        icon:'💬',xp:80,  reward:{コミュ力:15,デート力:5}},
-  {name:'初回デート成功',      desc:'初めてのデートを完了',          icon:'☕',xp:200, reward:{デート力:25,魅了力:15}},
-  {name:'2回目デートOK',       desc:'相手から2回目の承諾を得る',     icon:'🌟',xp:250, reward:{魅了力:20,デート力:15}},
-  {name:'コミュ力 Lv.5 達成',  desc:'コミュスコア50以上を達成',      icon:'💫',xp:150, reward:{コミュ力:10,魅了力:10}},
-  {name:'デート力 Lv.5 達成',  desc:'デートスコア50以上を達成',      icon:'🗺️',xp:150, reward:{デート力:10,魅了力:10}},
-  {name:'交際スタート',        desc:'パートナーと付き合い始める',     icon:'💑',xp:500, reward:{外見力:10,デート力:10,魅了力:10,コミュ力:10}},
-];
-
-const LV_THRESHOLDS = [0,100,250,450,700,1000,1400,1900,2500,3200];
-const LV_RANKS = ['見習い冒険者','新米冒険者','駆け出し冒険者','一人前冒険者',
-  '熟練冒険者','上級冒険者','エリート冒険者','魔剣士','伝説の恋愛師','恋愛の覇者'];
-
-// ─── STATE ──────────────────────────────────────────
-let state = {
-  avatarIdx: 2,
-  stats: {外見力:0,デート力:0,魅了力:0,コミュ力:0},
-  done: [],
-};
-function save(){ localStorage.setItem('lqm', JSON.stringify(state)); }
-function load(){
-  const d = localStorage.getItem('lqm');
-  if(d){ state = JSON.parse(d); }
+// 星を散りばめる
+const starsEl = document.getElementById('stars');
+for(let i=0;i<60;i++){
+  const s = document.createElement('div');
+  s.className = 'star';
+  const size = Math.random()*2 + 1;
+  s.style.width = size+'px';
+  s.style.height = size+'px';
+  s.style.left = Math.random()*100+'%';
+  s.style.top = Math.random()*70+'%';
+  s.style.animationDelay = (Math.random()*3)+'s';
+  starsEl.appendChild(s);
 }
 
-// ─── LEVEL CALC ─────────────────────────────────────
-function totalXP(){ return QUESTS.reduce((s,q,i)=>s+(state.done.includes(i)?q.xp:0),0); }
-function calcLv(xp){
-  for(let i=LV_THRESHOLDS.length-1;i>=0;i--) if(xp>=LV_THRESHOLDS[i]) return i+1;
-  return 1;
-}
-function statLv(v){ return Math.min(10,Math.floor(v/10)+1); }
+// BGM トグル(デフォルトミュート)
+const bgm = document.getElementById('bgm');
+const toggle = document.getElementById('soundToggle');
+let playing = false;
 
-// ─── RENDER ─────────────────────────────────────────
-function renderAvatar(){
-  const av = AVATARS[state.avatarIdx];
-  document.getElementById('av-icon').textContent = av.icon;
-  document.getElementById('av-name').textContent = av.name;
-  document.getElementById('av-sub').textContent  = av.sub;
-}
-
-function renderOverall(){
-  const xp  = totalXP();
-  const lv  = calcLv(xp);
-  const nxt = LV_THRESHOLDS[Math.min(lv, LV_THRESHOLDS.length-1)];
-  const prv = LV_THRESHOLDS[lv-1] || 0;
-  const pct = nxt > prv ? Math.round((xp-prv)/(nxt-prv)*100) : 100;
-  document.getElementById('ov-lv').textContent    = 'Lv.' + lv;
-  document.getElementById('ov-rank').textContent  = LV_RANKS[lv-1] || LV_RANKS[LV_RANKS.length-1];
-  document.getElementById('xp-bar').style.width   = pct + '%';
-  document.getElementById('xp-txt').textContent   = xp + ' / ' + nxt + ' XP';
-}
-
-function renderStats(){
-  const c = document.getElementById('stats-container');
-  c.innerHTML = '';
-  STATS.forEach(st => {
-    const val  = Math.min(100, state.stats[st.key] || 0);
-    const lv   = statLv(val);
-    const div  = document.createElement('div');
-    div.className = 'stat-row';
-    div.innerHTML = `
-      <div class="stat-head">
-        <span class="stat-name">${st.icon} ${st.key}</span>
-        <span class="stat-lv" style="color:${st.color}">Lv.${lv}</span>
-      </div>
-      <div class="stat-bar-bg">
-        <div class="stat-bar-fill" style="width:${val}%;background:${st.color}"></div>
-      </div>
-      <div class="stat-desc">${st.desc}</div>
-      <div class="stat-adj">
-        <button class="adj-btn" onclick="adjStat('${st.key}',-10)">−10</button>
-        <button class="adj-btn" onclick="adjStat('${st.key}',+10)">+10</button>
-      </div>`;
-    c.appendChild(div);
-  });
-}
-
-function renderQuests(){
-  const c  = document.getElementById('quest-container');
-  const qc = document.getElementById('q-count');
-  c.innerHTML = '';
-  qc.textContent = `${state.done.length} / ${QUESTS.length} 完了`;
-  QUESTS.forEach((q,i) => {
-    const done = state.done.includes(i);
-    const rewardTxt = Object.entries(q.reward).map(([k,v])=>`${k}+${v}`).join(' / ');
-    const div = document.createElement('div');
-    div.className = 'q-item' + (done?' done':'');
-    div.innerHTML = `
-      <span class="q-icon">${q.icon}</span>
-      <div class="q-body">
-        <div class="q-name">${q.name}</div>
-        <div class="q-desc">${q.desc}</div>
-        <div class="q-reward">🎁 ${rewardTxt}  (+${q.xp} XP)</div>
-      </div>
-      <span class="q-check"></span>`;
-    div.onclick = () => toggleQuest(i);
-    c.appendChild(div);
-  });
-}
-
-function renderAll(){
-  renderAvatar();
-  renderOverall();
-  renderStats();
-  renderQuests();
-}
-
-// ─── ACTIONS ────────────────────────────────────────
-function toggleQuest(i){
-  const prevLv = calcLv(totalXP());
-  const q = QUESTS[i];
-  const doneIdx = state.done.indexOf(i);
-  if(doneIdx >= 0){
-    state.done.splice(doneIdx,1);
-    Object.entries(q.reward).forEach(([k,v])=>{ state.stats[k] = Math.max(0,(state.stats[k]||0)-v); });
+toggle.addEventListener('click', () => {
+  if(!playing){
+    bgm.volume = 0.35;
+    bgm.play().then(() => {
+      playing = true;
+      toggle.textContent = '🔊 BGM: ON';
+    }).catch(() => {
+      toggle.textContent = '⚠️ BGM未設定';
+    });
   } else {
-    state.done.push(i);
-    Object.entries(q.reward).forEach(([k,v])=>{ state.stats[k] = Math.min(100,(state.stats[k]||0)+v); });
+    bgm.pause();
+    playing = false;
+    toggle.textContent = '🔇 BGM: OFF';
   }
-  save();
-  renderAll();
-  const newLv = calcLv(totalXP());
-  if(newLv > prevLv) showLevelUp(newLv);
-}
-
-function adjStat(key, delta){
-  state.stats[key] = Math.max(0, Math.min(100, (state.stats[key]||0) + delta));
-  save(); renderStats(); renderOverall();
-}
-
-function showLevelUp(lv){
-  const t = document.getElementById('toast');
-  document.getElementById('toast-title').textContent = '🌟 LEVEL UP!';
-  document.getElementById('toast-sub').textContent   = `Lv.${lv} 「${LV_RANKS[lv-1]}」に昇格！`;
-  t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'), 2800);
-}
-
-// ─── AVATAR MODAL ────────────────────────────────────
-function openModal(){
-  document.getElementById('modal').style.display = 'flex';
-}
-function buildModal(){
-  const g = document.getElementById('av-grid');
-  g.innerHTML = '';
-  AVATARS.forEach((av,i) => {
-    const d = document.createElement('div');
-    d.className = `av-card ${av.type}`;
-    d.innerHTML = `<div class="av-icon">${av.icon}</div><div class="av-name">${av.name}</div>`;
-    d.onclick = () => selectAvatar(i);
-    g.appendChild(d);
-  });
-}
-function selectAvatar(i){
-  state.avatarIdx = i;
-  save();
-  document.getElementById('modal').style.display = 'none';
-  renderAvatar();
-}
-
-// ─── DEMO / RESET ────────────────────────────────────
-function loadDemo(){
-  const prevLv = calcLv(totalXP());
-  state.done = [0,1,3,4];
-  state.stats = {外見力:30, デート力:30, 魅了力:30, コミュ力:40};
-  save(); renderAll();
-  const newLv = calcLv(totalXP());
-  if(newLv > prevLv) showLevelUp(newLv);
-}
-function resetAll(){
-  state = {avatarIdx:state.avatarIdx, stats:{外見力:0,デート力:0,魅了力:0,コミュ力:0}, done:[]};
-  save(); renderAll();
-}
-
-// ─── INIT ────────────────────────────────────────────
-load();
-buildModal();
-if(localStorage.getItem('lqm')){
-  document.getElementById('modal').style.display = 'none';
-} else {
-  document.getElementById('modal').style.display = 'flex';
-}
-renderAll();
+});
 </script>
 </body>
 </html>
