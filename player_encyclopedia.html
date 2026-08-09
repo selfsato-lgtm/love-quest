@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>LOVEQUESTプレイヤー図鑑</title>
+<style>
+:root{
+  --bg:#0D0D1A; --card:#1A1A35; --card2:#12122A;
+  --gold:#F5A623; --red:#E94560; --blue:#4A9EDB;
+  --green:#4CAF73; --purple:#7B5EA7;
+  --white:#FFFFFF; --light:#E0E0E0; --muted:#8888AA;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Yu Gothic UI','Hiragino Sans','Meiryo',sans-serif;
+  background:var(--bg);color:var(--light);min-height:100vh}
+header{background:linear-gradient(135deg,#0D0D1A 0%,#1A0D2E 100%);
+  border-bottom:1px solid #2a2a4a;padding:14px 16px;text-align:center}
+header h1{font-size:20px;font-weight:900;color:var(--gold);letter-spacing:1px}
+header p{font-size:11.5px;color:var(--muted);margin-top:4px}
+.tabs{display:flex;justify-content:center;gap:8px;padding:12px;flex-wrap:wrap}
+.tab{font-size:12.5px;padding:7px 16px;border-radius:20px;border:1px solid #444;
+  background:transparent;color:var(--muted);cursor:pointer;transition:.15s}
+.tab.on{background:var(--gold);color:var(--bg);border-color:var(--gold);font-weight:700}
+.wrap{max-width:900px;margin:0 auto;padding:0 14px 30px}
+
+/* ── ROSTER ── */
+#view-roster{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.pc-card{background:var(--card);border:1px solid #2a2a4a;border-radius:12px;padding:12px;cursor:pointer;transition:.15s}
+.pc-card:hover{border-color:var(--gold);transform:translateY(-2px)}
+.pc-card .icon{font-size:34px;text-align:center}
+.pc-card .name{font-size:13px;font-weight:900;color:var(--white);text-align:center;margin-top:4px}
+.pc-card .elem{font-size:10px;color:var(--muted);text-align:center;margin-top:2px}
+.pc-card .stars{font-size:10px;text-align:center;margin-top:4px;color:var(--gold)}
+
+/* ── DETAIL / PLAYER SHEET ── */
+.sheet{background:var(--card);border:1px solid #2a2a4a;border-radius:14px;padding:16px;margin-top:10px}
+.sheet-head{display:flex;align-items:center;gap:14px;border-bottom:1px solid #2a2a4a;padding-bottom:12px;margin-bottom:12px}
+.sheet-head .icon{font-size:48px}
+.sheet-head .name{font-size:20px;font-weight:900;color:var(--gold)}
+.sheet-head .comp{font-size:12px;color:var(--muted)}
+.sheet-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 20px;font-size:12.5px}
+.sheet-grid .lbl{color:var(--muted);font-size:10.5px;margin-bottom:3px}
+.sheet-grid .val{color:var(--light)}
+.tag{display:inline-block;background:var(--card2);border:1px solid #333;border-radius:8px;
+  padding:2px 8px;margin:2px 3px 2px 0;font-size:11px}
+.back-btn{font-size:11px;padding:4px 10px;border-radius:8px;border:1px solid #444;
+  background:transparent;color:var(--muted);cursor:pointer;margin-bottom:10px}
+
+/* ── CHECKER ── */
+#view-checker{display:none}
+.picker-row{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;margin:14px 0}
+.picker{background:var(--card);border:1px solid #2a2a4a;border-radius:12px;padding:10px 14px;
+  display:flex;align-items:center;gap:8px;cursor:pointer;min-width:150px;justify-content:center}
+.picker .icon{font-size:26px}
+.picker .name{font-size:13px;font-weight:700}
+.vs{font-size:20px;color:var(--gold);font-weight:900}
+.go-btn{display:block;margin:0 auto;font-size:13px;padding:8px 24px;border-radius:20px;
+  border:none;background:var(--gold);color:var(--bg);font-weight:900;cursor:pointer}
+
+/* Pair selection modal */
+#pickModal{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:100;display:none;
+  align-items:center;justify-content:center;padding:16px}
+#pickModal .box{background:var(--card);border-radius:14px;padding:16px;max-width:560px;width:100%;max-height:80vh;overflow:auto}
+#pickModal h3{color:var(--gold);font-size:15px;margin-bottom:10px;text-align:center}
+.pick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.pick-item{background:var(--card2);border:1px solid #333;border-radius:8px;padding:8px 4px;text-align:center;cursor:pointer}
+.pick-item:hover{border-color:var(--gold)}
+.pick-item .icon{font-size:22px}
+.pick-item .name{font-size:9.5px;font-weight:700;margin-top:2px}
+
+/* ── COMPAT RESULT ── */
+#result{display:none}
+.compat-head{text-align:center;padding:14px;border-bottom:1px solid #2a2a4a;margin-bottom:14px}
+.compat-head .pair{font-size:15px;font-weight:900;color:var(--white)}
+.compat-head .icons{font-size:44px;margin:8px 0}
+.stars-row{display:flex;justify-content:center;gap:24px;flex-wrap:wrap;margin-bottom:16px}
+.star-block{text-align:center}
+.star-block .lbl{font-size:10.5px;color:var(--muted)}
+.star-block .stars{font-size:16px;color:var(--gold)}
+.sec-title{font-size:13px;font-weight:700;color:var(--gold);margin:14px 0 6px;
+  display:flex;align-items:center;gap:6px}
+.sec-body{font-size:12.5px;line-height:1.7;color:var(--light)}
+.spell-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.spell{font-size:11px;padding:3px 10px;border-radius:10px;background:var(--card2);border:1px solid var(--green);color:var(--green)}
+.spell.ng{border-color:var(--red);color:var(--red)}
+.boss-box{background:linear-gradient(135deg,#2A0D1A,#1A0D2E);border:1px solid var(--red);
+  border-radius:10px;padding:12px;margin-top:6px}
+.boss-box .t{color:var(--red);font-weight:900;font-size:13px}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📖 LOVEQUESTプレイヤー図鑑</h1>
+  <p>恋愛式学 × RPG化プロトタイプ ｜ 16タイプ × 16タイプ = 256通りの相性を自動生成</p>
+</header>
+
+<div class="tabs">
+  <button class="tab on" id="tabRoster" onclick="showView('roster')">📖 図鑑一覧</button>
+  <button class="tab" id="tabChecker" onclick="showView('checker')">💞 相性チェッカー</button>
+</div>
+
+<div class="wrap">
+  <div id="view-roster"></div>
+
+  <div id="view-checker">
+    <div class="picker-row">
+      <div class="picker" id="pickA" onclick="openPick('A')">
+        <span class="icon" id="pickA-icon">⚔️</span><span class="name" id="pickA-name">狂戦士</span>
+      </div>
+      <span class="vs">×</span>
+      <div class="picker" id="pickB" onclick="openPick('B')">
+        <span class="icon" id="pickB-icon">📖</span><span class="name" id="pickB-name">牧師</span>
+      </div>
+    </div>
+    <button class="go-btn" onclick="renderCompat()">⚔️ 相性を診断する</button>
+
+    <div id="result">
+      <div class="compat-head">
+        <div class="icons"><span id="rA-icon"></span> × <span id="rB-icon"></span></div>
+        <div class="pair" id="r-pair"></div>
+      </div>
+      <div class="stars-row">
+        <div class="star-block"><div class="lbl">⭐ 総合相性</div><div class="stars" id="s-total"></div></div>
+        <div class="star-block"><div class="lbl">❤️ 恋愛相性</div><div class="stars" id="s-love"></div></div>
+        <div class="star-block"><div class="lbl">💍 結婚相性</div><div class="stars" id="s-marriage"></div></div>
+        <div class="star-block"><div class="lbl">💬 LINE相性</div><div class="stars" id="s-line"></div></div>
+      </div>
+      <div class="sec-title">📜 相性メモ</div>
+      <div class="sec-body" id="c-essay"></div>
+      <div class="sec-title">🍽 デート相性・おすすめスポット</div>
+      <div class="sec-body" id="c-date"></div>
+      <div class="sec-title">⚔ 喧嘩ポイント</div>
+      <div class="sec-body" id="c-fight"></div>
+      <div class="sec-title">🛡 攻略法</div>
+      <div class="sec-body" id="c-strategy"></div>
+      <div class="sec-title">🪄 有効呪文 / 🚫 NG呪文</div>
+      <div class="spell-row" id="c-spell-good"></div>
+      <div class="spell-row" id="c-spell-ng" style="margin-top:6px"></div>
+      <div class="boss-box">
+        <div class="t">👑 ラスボス</div>
+        <div class="sec-body" id="c-boss" style="margin-top:4px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Player detail sheet (roster tab) -->
+<div class="wrap" id="detailWrap" style="display:none">
+  <button class="back-btn" onclick="closeDetail()">← 図鑑に戻る</button>
+  <div class="sheet" id="detailSheet"></div>
+</div>
+
+<!-- Pick modal for checker -->
+<div id="pickModal">
+  <div class="box">
+    <h3 id="pickModalTitle">タイプを選択</h3>
+    <div class="pick-grid" id="pickGrid"></div>
+  </div>
+</div>
+
+<script>
+// ─── BASE TYPE TRAITS (戦士/踊り子/僧侶/魔法使い) ───────────
+const BASE = {
+  SE:{ name:'戦士', elem:'🔥情熱×合理', loc:['ジム・サウナ','スポーツ観戦','経営者交流会','ゴルフ場','高級店'],
+       like:['称賛','挑戦','頼られること','成果承認'], weak:['否定','見下し','モタモタ','コントロール'],
+       phrase:'「さすが！」「頼もしい」' },
+  OD:{ name:'踊り子', elem:'☀️情熱×情緒', loc:['テーマパーク','フェス','カフェ巡り','飲み会','映えスポット'],
+       like:['共感','楽しい時間','リアクション','褒め言葉'], weak:['無関心','共感の欠如','束縛','退屈'],
+       phrase:'「一緒にいると楽しい！」' },
+  SO:{ name:'僧侶', elem:'🌙冷静×情緒', loc:['カフェ','神社','ヨガスタジオ','温泉','読書会'],
+       like:['安心','思いやり','感謝','静けさ'], weak:['否定','急かされること','命令口調','騒がしさ'],
+       phrase:'「いつも支えてくれて助かる」' },
+  MA:{ name:'魔法使い', elem:'🌑冷静×合理', loc:['美術館','プラネタリウム','一人旅先','書店','アートイベント'],
+       like:['センス','納得','理解','深い会話'], weak:['安易な称賛','知ったかぶり','馴れ馴れしさ','浅いノリ'],
+       phrase:'「センスいいね（理由つき）」' },
+};
+
+// ─── 16 TYPES = 主×副 ─────────────────────────────────
+const TYPES = [
+  {code:'狂戦士',icon:'⚔️',p:'SE',s:'SE'},
+  {code:'勇者',  icon:'🦸',p:'SE',s:'OD'},
+  {code:'魔法戦士',icon:'🧙',p:'SE',s:'MA'},
+  {code:'聖戦士',icon:'🛡️',p:'SE',s:'SO'},
+  {code:'姫',   icon:'👸',p:'OD',s:'OD'},
+  {code:'騎士',  icon:'🏇',p:'OD',s:'SE'},
+  {code:'盗賊',  icon:'🗡️',p:'OD',s:'MA'},
+  {code:'妖精',  icon:'🧚',p:'OD',s:'SO'},
+  {code:'シスター',icon:'🌿',p:'SO',s:'SO'},
+  {code:'兵士',  icon:'🪖',p:'SO',s:'SE'},
+  {code:'牧師',  icon:'📖',p:'SO',s:'OD'},
+  {code:'賢者',  icon:'🦉',p:'SO',s:'MA'},
+  {code:'魔道士',icon:'🔮',p:'MA',s:'MA'},
+  {code:'忍者',  icon:'🥷',p:'MA',s:'SE'},
+  {code:'道化師',icon:'🎭',p:'MA',s:'OD'},
+  {code:'占い師',icon:'⭐',p:'MA',s:'SO'},
+];
+
+// ─── RANK TABLE（個別認識学2021マスター準拠）1=最良 4=最弱 ───
+const RANK = {
+  MA:{ work:['MA','SE','SO','OD'], love:['MA','SO','SE','OD'], marriage:['OD','SO','MA','SE'] },
+  SE:{ work:['MA','SO','OD','SE'], love:['SE','OD','MA','SO'], marriage:['SO','SE','MA','OD'] },
+  SO:{ work:['SE','OD','MA','SO'], love:['OD','SO','MA','SE'], marriage:['SE','OD','SO','MA'] },
+  OD:{ work:['SE','OD','SO','MA'], love:['OD','SO','SE','MA'], marriage:['MA','OD','SO','SE'] },
+};
+
+// ─── SPELLS ─────────────────────────────────────────
+const SPELL_GOOD = { SE:['ライデイン','スクルト'], OD:['バイキルト','ザオリク'], SO:['ベホマラー','スカラ'], MA:['マホトラ','インパス'] };
+const SPELL_NG   = { SE:['メガンテ（自爆発言）'], OD:['ラリホー（放置プレイ）'], SO:['ザラキ（即否定）'], MA:['ベタンコ（馴れ馴れしさ）'] };
+
+// ─── HELPERS ────────────────────────────────────────
+function rarityOf(t){
+  if(t.p===t.s) return 3;
+  const diag = (t.p==='SE'&&t.s==='SO')||(t.p==='SO'&&t.s==='SE')||(t.p==='OD'&&t.s==='MA')||(t.p==='MA'&&t.s==='OD');
+  return diag ? 5 : 4;
+}
+function starStr(n){ return '★'.repeat(n) + '☆'.repeat(5-n); }
+function blendTraits(t, field, primaryCount, secCount){
+  const arr = [...BASE[t.p][field].slice(0,primaryCount)];
+  BASE[t.s][field].slice(0,secCount).forEach(x=>{ if(!arr.includes(x)) arr.push(x); });
+  return arr;
+}
+function viewerRank(viewerBase, targetBase, cat){ return RANK[viewerBase][cat].indexOf(targetBase)+1; }
+function starsFromRank(avgRank){ return Math.max(1, Math.min(5, Math.round(6-avgRank))); }
+function calcStars(A,B,cat){
+  const aView = 0.65*(0.65*viewerRank(A.p,B.p,cat)+0.35*viewerRank(A.p,B.s,cat)) + 0.35*(0.65*viewerRank(A.s,B.p,cat)+0.35*viewerRank(A.s,B.s,cat));
+  const bView = 0.65*(0.65*viewerRank(B.p,A.p,cat)+0.35*viewerRank(B.p,A.s,cat)) + 0.35*(0.65*viewerRank(B.s,A.p,cat)+0.35*viewerRank(B.s,A.s,cat));
+  return starsFromRank((aView+bView)/2);
+}
+function lineStars(A,B){
+  // LINE相性は恋愛相性と情熱軸(SE/OD)の一致度から算出
+  const love = calcStars(A,B,'love');
+  const bothWarm = (['SE','OD'].includes(A.p) && ['SE','OD'].includes(B.p));
+  const bothCool = (['SO','MA'].includes(A.p) && ['SO','MA'].includes(B.p));
+  let adj = 0;
+  if(bothWarm) adj = 1; else if(bothCool) adj = -1;
+  return Math.max(1, Math.min(5, love + (adj>0?0:(adj<0?-1:0))));
+}
+
+// ─── ROSTER RENDER ──────────────────────────────────
+function renderRoster(){
+  const el = document.getElementById('view-roster');
+  el.innerHTML = '';
+  TYPES.forEach((t, idx) => {
+    const r = rarityOf(t);
+    const d = document.createElement('div');
+    d.className = 'pc-card';
+    d.innerHTML = `<div class="icon">${t.icon}</div><div class="name">${t.code}</div>
+      <div class="elem">${BASE[t.p].name}×${BASE[t.s].name}</div>
+      <div class="stars">${starStr(r)}</div>`;
+    d.onclick = () => openDetail(idx);
+    el.appendChild(d);
+  });
+}
+
+function openDetail(idx){
+  const t = TYPES[idx];
+  const r = rarityOf(t);
+  document.getElementById('view-roster').parentElement.style.display = 'none';
+  document.querySelector('.tabs').style.display = 'none';
+  document.getElementById('detailWrap').style.display = 'block';
+  const loc = blendTraits(t,'loc',3,2), like = blendTraits(t,'like',3,2), weak = blendTraits(t,'weak',3,2);
+  document.getElementById('detailSheet').innerHTML = `
+    <div class="sheet-head">
+      <span class="icon">${t.icon}</span>
+      <div><div class="name">${t.code}</div><div class="comp">${BASE[t.p].name}(主) × ${BASE[t.s].name}(副)</div></div>
+    </div>
+    <div class="sheet-grid">
+      <div><div class="lbl">属性</div><div class="val">${BASE[t.p].elem}</div></div>
+      <div><div class="lbl">レア度 / 捕獲難易度</div><div class="val">${starStr(r)} / ${starStr(r)}</div></div>
+      <div style="grid-column:1/-1"><div class="lbl">出現場所</div>
+        <div>${loc.map(x=>`<span class="tag">${x}</span>`).join('')}</div></div>
+      <div style="grid-column:1/-1"><div class="lbl">好物（響く言葉・行動）</div>
+        <div>${like.map(x=>`<span class="tag">${x}</span>`).join('')}</div></div>
+      <div style="grid-column:1/-1"><div class="lbl">弱点（NG行動）</div>
+        <div>${weak.map(x=>`<span class="tag">${x}</span>`).join('')}</div></div>
+      <div style="grid-column:1/-1"><div class="lbl">刺さる殺し文句</div><div class="val">${BASE[t.p].phrase}</div></div>
+    </div>`;
+}
+function closeDetail(){
+  document.getElementById('detailWrap').style.display = 'none';
+  document.querySelector('.tabs').style.display = 'flex';
+  document.getElementById('view-roster').parentElement.style.display = 'block';
+}
+
+// ─── VIEW TOGGLE ────────────────────────────────────
+function showView(v){
+  document.getElementById('view-roster').style.display = v==='roster' ? 'grid' : 'none';
+  document.getElementById('view-checker').style.display = v==='checker' ? 'block' : 'none';
+  document.getElementById('tabRoster').classList.toggle('on', v==='roster');
+  document.getElementById('tabChecker').classList.toggle('on', v==='checker');
+  closeDetail();
+}
+
+// ─── CHECKER: PICK MODAL ────────────────────────────
+let pickTarget = 'A';
+let selA = TYPES[0], selB = TYPES[10];
+function openPick(target){
+  pickTarget = target;
+  document.getElementById('pickModalTitle').textContent = (target==='A'?'タイプA':'タイプB') + ' を選択';
+  const g = document.getElementById('pickGrid');
+  g.innerHTML = '';
+  TYPES.forEach(t => {
+    const d = document.createElement('div');
+    d.className = 'pick-item';
+    d.innerHTML = `<div class="icon">${t.icon}</div><div class="name">${t.code}</div>`;
+    d.onclick = () => { if(target==='A') selA=t; else selB=t; updatePickers(); closePick(); };
+    g.appendChild(d);
+  });
+  document.getElementById('pickModal').style.display = 'flex';
+}
+function closePick(){ document.getElementById('pickModal').style.display = 'none'; }
+document.getElementById('pickModal').onclick = (e) => { if(e.target.id==='pickModal') closePick(); };
+function updatePickers(){
+  document.getElementById('pickA-icon').textContent = selA.icon;
+  document.getElementById('pickA-name').textContent = selA.code;
+  document.getElementById('pickB-icon').textContent = selB.icon;
+  document.getElementById('pickB-name').textContent = selB.code;
+}
+
+// ─── COMPAT RESULT RENDER ────────────────────────────
+function renderCompat(){
+  const A = selA, B = selB;
+  const total = Math.round((calcStars(A,B,'work')+calcStars(A,B,'love')+calcStars(A,B,'marriage'))/3);
+  const love = calcStars(A,B,'love'), marriage = calcStars(A,B,'marriage'), line = lineStars(A,B);
+
+  document.getElementById('rA-icon').textContent = A.icon;
+  document.getElementById('rB-icon').textContent = B.icon;
+  document.getElementById('r-pair').textContent = `【${A.code}】 × 【${B.code}】`;
+  document.getElementById('s-total').textContent = starStr(total);
+  document.getElementById('s-love').textContent = starStr(love);
+  document.getElementById('s-marriage').textContent = starStr(marriage);
+  document.getElementById('s-line').textContent = starStr(line);
+
+  const aLike = BASE[A.p].like, bLike = BASE[B.p].like;
+  const aWeak = BASE[A.p].weak, bWeak = BASE[B.p].weak;
+
+  document.getElementById('c-essay').textContent =
+    `${A.code}は${aLike[0]}を大切にし、${B.code}は${bLike[0]}を大切にするタイプ。` +
+    `${love>=4 ? 'お互いの価値観が自然に噛み合いやすく、無理のない関係を築けます。' : love===3 ? 'ペースの違いはあるものの、歩み寄れば十分に良い関係になれます。' : 'エネルギーの向き方が異なるため、意識的な歩み寄りが鍵になります。'}`;
+
+  const spots = [...new Set([...BASE[A.p].loc.slice(0,3), ...BASE[B.p].loc.slice(0,2)])].slice(0,5);
+  document.getElementById('c-date').textContent = `おすすめ: ${spots.join(' / ')}`;
+
+  document.getElementById('c-fight').textContent =
+    `${A.code}が「${aWeak[0]}」を感じ、${B.code}が「${bWeak[0]}」を感じた時に衝突しやすい関係です。`;
+
+  document.getElementById('c-strategy').textContent =
+    `${A.code}には ${BASE[B.p].phrase.replace(/」「/g,'／').replace(/[「」]/g,'')} を、` +
+    `${B.code}には ${BASE[A.p].phrase.replace(/」「/g,'／').replace(/[「」]/g,'')} を意識すると関係が長続きします。`;
+
+  const good = [...new Set([...SPELL_GOOD[A.p], ...SPELL_GOOD[B.p]])];
+  const ng   = [...new Set([...SPELL_NG[A.p], ...SPELL_NG[B.p]])];
+  document.getElementById('c-spell-good').innerHTML = good.map(s=>`<span class="spell">🪄${s}</span>`).join('');
+  document.getElementById('c-spell-ng').innerHTML   = ng.map(s=>`<span class="spell ng">❌${s}</span>`).join('');
+
+  document.getElementById('c-boss').textContent =
+    `「${A.code}の${aWeak[0]}」と「${B.code}の${bWeak[0]}」がすれ違った瞬間。ここを越えられるかが関係の分岐点です。`;
+
+  document.getElementById('result').style.display = 'block';
+}
+
+// ─── INIT ────────────────────────────────────────────
+renderRoster();
+updatePickers();
+</script>
+</body>
+</html>
