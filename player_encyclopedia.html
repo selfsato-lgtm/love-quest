@@ -60,6 +60,24 @@ header p{font-size:11px;color:var(--muted);margin-top:3px}
 .back-btn{font-size:11px;padding:4px 10px;border-radius:8px;border:1px solid #444;
   background:transparent;color:var(--muted);cursor:pointer;margin-bottom:10px}
 
+/* ── MASTER TRAITS (継承マスター資料) ── */
+.mt-wrap{margin-top:16px;padding-top:14px;border-top:1px dashed #333}
+.mt-heading{font-size:13px;font-weight:900;color:var(--gold);margin-bottom:10px}
+.mt-section{margin-bottom:14px}
+.mt-title{font-size:11.5px;font-weight:900;color:var(--white);margin-bottom:6px;
+  padding-bottom:3px;border-bottom:1px solid #2a2a4a}
+.mt-list{list-style:none;font-size:12px;color:var(--light);line-height:1.9}
+.mt-list li{padding-left:14px;position:relative}
+.mt-list li::before{content:'・';position:absolute;left:0;color:var(--gold)}
+.mt-values{display:flex;flex-direction:column;gap:8px}
+.mt-value{background:var(--card2);border:1px solid #2a2a4a;border-radius:10px;padding:8px 10px}
+.mt-value-t{font-size:12px;font-weight:700;color:var(--gold)}
+.mt-value-d{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.6}
+.mt-wordcat{margin-bottom:8px}
+.mt-wordcat-t{font-size:11px;color:var(--muted);margin-bottom:4px}
+.mt-source{font-size:10px;color:#555570;text-align:right;margin-top:6px}
+.mt-badge{font-size:9px;margin-left:3px}
+
 /* ── CHECKER ── */
 #view-checker{display:none}
 .picker-row{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;margin:14px 0}
@@ -222,6 +240,83 @@ const TYPES = [
   {code:'占い師',icon:'⭐',file:'uranaishi',p:'MA',s:'SO'},
 ];
 
+// 継承マスター講座資料（FANTS パーソナル恋愛式学）に基づく詳細特性データ。判明分から順次追加
+const MASTER_TRAITS = {
+  '妖精': {
+    personality: ['社交的で自由奔放、明るくて楽観的', '中心人物で人気キャラ', '相思相愛の根幹があり好奇心旺盛'],
+    values: [
+      {t:'「場の空気＝自分の心」な人', d:'その場が明るいと元気、重いと一気にしょんぼり。空気に敏感。'},
+      {t:'"楽しい"を最優先する人', d:'正しさより楽しさ。前向きなエネルギーを大事にする。'},
+      {t:'「一緒にいると元気になる人」でありたい人', d:'誰かの太陽ポジションでいることに喜びを感じる。'},
+      {t:'みんなと仲良くしたい平和主義者', d:'対立が苦手。できれば全員と笑っていたい。'},
+      {t:'自由にのびのび愛されたい人', d:'束縛は苦手。でも放置も寂しい。'},
+      {t:'明るいけど、本当はさみしがり屋', d:'笑顔の裏で「安心できる居場所」を求めている。'},
+    ],
+    strengths: ['気づいたら場の空気を整えている', '「ありがとう」と言われると全力で頑張れる', '人の小さな変化にいち早く気づく', '頼まれごとを断れないけど、ちゃんとやり切る', 'チームの潤滑油ポジションが自然にハマる', '周りが落ち込んでいると自分まで放っておけない', '感謝や愛情を言葉でちゃんと伝える', '誰かが一人にならないよう無意識に配慮する', 'ピンチのときほど「何とかしなきゃ」と責任感が出る', '一緒にいると安心感があると言われがち'],
+    weaknesses: ['自分の予定より人の都合を優先してしまう', '本当は疲れてるのに「大丈夫！」と言ってしまう', '期待に応えようとしすぎてキャパオーバー', '嫌でも空気を読んでしまう', 'NOと言えずに後で自己嫌悪', '周りの評価が下がると一気に落ち込む', '自分の本音より「丸く収まる選択」をする', '一人になるとどっと疲れが出る', '明るく振る舞うほど、実は寂しくなることがある', '「いい人」でいようとして自分を後回しにする'],
+    loveView: ['「好き」より「安心する」が重要', '相手が喜ぶ顔を見ると、それだけで幸せ', '記念日やイベントはちゃんと大切にしたい', '感謝や愛情表現が少ないと不安になる', 'ケンカはできれば避けたい（話し合いで解決希望）', '一緒に過ごす"何気ない日常"を何より大事にする', '相手の家族や友達からの印象が気になる', '「大切にされている実感」がないと寂しくなる', '自分が頑張ればうまくいくと思ってしまう', '一度本気になると、かなり一途'],
+    okWords: [
+      {cat:'存在そのものを認める言葉', items:['いてくれるだけで場が明るくなる', 'あなたがいると安心する', 'その場にいてくれるだけで助かってるよ', '空気が柔らかくなるよね']},
+      {cat:'感謝と信頼をセットで伝える言葉', items:['頼っていいって思える', 'あなたに任せたいと思った', '一緒にいると心強い', 'あなたがいると、うまく回る']},
+      {cat:'気配り・努力を具体的に認める言葉', items:['そこまで気づいてくれてたんだね', 'あのフォロー、すごく助かった', 'みんなのことちゃんと見てるよね', 'さりげない気遣いが本当にありがたい']},
+      {cat:'愛情・好意を安心感ベースで伝える言葉', items:['無理しなくていいよ', '頑張りすぎなくて大丈夫', 'ちゃんと大切に思ってる', 'あなたの優しさが好き']},
+    ],
+    ngWords: [
+      {cat:'軽視・当たり前扱い', items:['それくらい普通でしょ', '誰でもできるよ', 'いつものことじゃん', 'やってくれると思ってた']},
+      {cat:'感情を雑に扱う言葉', items:['気にしすぎ', '考えすぎだよ', 'そんなことで落ち込む？', 'めんどくさいな']},
+      {cat:'協力を否定する言葉', items:['一人でやったほうが早い', '別に手伝わなくていい', 'そこまでしなくていいよ']},
+      {cat:'空気を壊す強い言い方', items:['はっきり言って', '感情論だよね', '論理的じゃない', '効率悪くない？']},
+    ],
+  },
+  '牧師': {
+    personality: ['内向的・思慮深い・感受性が高い', '一人で考える時間が不可欠', '人に合わせられるが、内側では葛藤しやすい', '理想と現実の狭間で揺れやすい', '表では穏やか、内面は情熱的'],
+    values: [
+      {t:'1人の心・想い・意味を何より大切にする', d:'人の気持ちに敏感／深い共感／形より意味重視／安心感のある関係が好き'},
+      {t:'「正しいか」より「誠実か」「想いがあるか」を重視', d:'嘘やごまかしに敏感／言葉より態度／誠実さに安心／裏表がない人が好き'},
+    ],
+    communication: ['相手の話を最後まで遮らずに聴く', 'まずは「気持ち」を受け止めてから意見を言う', '強い言い方をされると一気に心が閉じる', '本音はすぐに出さず、信頼関係ができてから話す', '空気や沈黙の意味を敏感に察する', '「わかるよ」と言われると一気に安心する', '共感してもらえないと静かに距離を取る', '言葉を選びすぎて、発言が遅くなることがある', '対立になりそうだと自分が引いてしまう', '表面上は穏やかでも、内側では深く考えている'],
+    relationship: ['一度信頼すると、とことん尽くす', '表面的な関係では満足できない', '「理解されている」と感じると一気に心が安定する', '不安を感じると静かに距離を取る', '感情を共有できる時間がないと寂しくなる', '相手のために自己犠牲を選びがち', '話し合いができる関係だと長続きする', '一度裏切られると立て直すのに時間がかかる', '深い絆ができると、簡単には離れない', '「この人と人生を共にできるか」を常に考えている'],
+    okWords: [
+      {cat:'存在・価値観を肯定する言葉（最重要）', items:['人の見えないところで頑張ってくれたんだね', '継続できる力ってすごいと思う', '着々と進めるの上手いよね', 'あなたの価値観、好きだな', 'その想い、軽く扱えない']},
+      {cat:'共感・理解を示す言葉', items:['分かってもらえた', 'そう感じるの、自然だと思う', '無理してたんじゃない？', 'それ、しんどかったよね', '簡単に割り切れないよね']},
+      {cat:'安心・信頼を与える言葉', items:['そのままで大丈夫だよ', '急がなくていい', '無理しなくていいよ', 'ちゃんと大切にしたい', '一緒に考えたい']},
+      {cat:'想いを大事にする恋愛ワード', items:['ちゃんと向き合いたい', '大切に思ってる', '心の部分を大事にしたい', '信頼してる', 'ゆっくりでも一緒に進みたい']},
+    ],
+    ngWords: [
+      {cat:'感情・理想を否定する言葉（致命傷）', items:['考えすぎ', 'もっと主張して', '自分の考えちゃんと持って', 'そんなの現実的じゃない', '意味ある？']},
+      {cat:'軽さ・ノリ重視の言葉', items:['深く考えなくてよくない？', '気楽にいこうよ', 'そんな重く取らなくていいじゃん', 'ノリでいいでしょ']},
+      {cat:'正論・効率・結果だけの言葉', items:['結果がすべてでしょ', 'それって無駄じゃない？', '早く決めなよ', '普通はこうするよ']},
+      {cat:'強い否定・詰める言葉', items:['だからダメなんだよ', 'はっきり言って', 'なんでできないの？', '自分で決めなよ（突き放し）']},
+    ],
+  },
+  '賢者': {
+    personality: ['内向的・控えめ・思慮深い', '感受性が高く、内面はとても感情豊か', '柔軟そうに見えて、内側には譲れない軸がある', '自己主張が苦手で、飲み込む癖がある', '優しいが、繊細で傷つきやすい'],
+    strengths: ['物事を俯瞰して考えるクセがある', '決断前に必ず情報を集める', '感情よりも事実やデータを重視', '恋愛でも勢いより安定感を求める', '衝動買いや突発的行動はほぼない', '無駄な争いや感情的な議論を避ける', '落ち着いた人や環境を好む', '論理的な説明を求める癖がある', '周りから相談されやすい', '大人数より少人数の関係を深める'],
+    weaknesses: ['本音を飲み込んで後からモヤモヤする', '急かされると一気に思考停止する', '束縛や圧を感じると静かに距離を取る', '頑固だけどそれを表に出さない', '決断前に考えすぎてタイミングを逃す', '「大丈夫」と言いながら無理している', '強く出られると反論せず内側で固まる', '自分の感情整理に時間がかかる', '怒りを表に出さず、ある日急に線を引く', '我慢強すぎて限界が分かりにくい'],
+    okWords: [
+      {cat:'内面・在り方を尊重する言葉', items:['あなたの考え方、好きだな', 'その感じ方、大切にしてるの伝わる', '無理に合わせなくていいよ', 'あなたのペースでいい']},
+      {cat:'感受性を理解する言葉', items:['気づく人にしか気づけないよね', '感じ取ってること、ちゃんとあるよね', 'その違和感、大事にしていいと思う']},
+      {cat:'正義感・誠実さに触れる言葉', items:['ちゃんと筋を通そうとしてるよね', '誠実な選択してると思う', '誰も見てなくても、正しい方選ぶよね', '信頼できる人だなって思う']},
+      {cat:'恋愛・親密な場面で刺さる言葉', items:['一緒にいて落ち着く', '静かな時間も心地いい', 'ちゃんと大切にしたいと思ってる', 'そばにいてくれるだけでいい']},
+    ],
+    ngWords: [
+      {cat:'感性・直感を否定する言葉', items:['考えすぎ', '気にしすぎ', 'そんなの意味ある？', '感情論だよね']},
+      {cat:'正しさを踏みにじる言葉', items:['別に嘘ついてもいいじゃん', 'みんなやってるよ', '損するよ、そんな正直で', '要領悪くない？']},
+      {cat:'束縛・圧・急かし', items:['早く決めて', '普通こうするでしょ', 'なんで動かないの？', '白黒はっきりして']},
+      {cat:'雑音の多い強い言葉', items:['ハッキリ言って', '理屈っぽい', 'ノリ悪いよね', '空気読んでよ']},
+    ],
+  },
+  '占い師': {
+    personality: ['冷静・妄想癖・マイペース', '独立心が非常に強い', '感情より事実を優先', '他人に干渉しない／されないを好む', '柔軟だが頑固な一面もある', '言葉数は少ないが観察力は高い', '感情のコントロールが苦手（言葉に出さず態度に出す）'],
+    values: ['言葉にはせず、頭の中で一人で自己完結させる', '「現実に役立つか」「自分で納得できるか」が基準', '理想や感情よりも「実際どうなるか」を重視', '他人の期待より、自分の判断基準を信じる', '効率・合理性・再現性があるものに安心感', '無駄な努力や形だけのルールを嫌う', '表面上ではなく心のつながりを求める', '喜怒哀楽を態度で示す'],
+    weaknesses: ['「ただ共感してほしい」に対応できず固まる', '本音を言わずに自己完結してしまう', '冷静すぎて冷たく誤解される', '感情のフォローが遅れる', '助けを求める前に自分で抱え込む', '抽象的な未来の話になると集中力が落ちる', '感情的に詰められるとシャットダウン', '「大丈夫」と言いながら全部自分でやる', '不満を言わず、ある日突然距離を取る', 'ロマンチックな空気に少し戸惑う'],
+    loveView: ['自由と自立が最優先', '束縛・依存が苦手', '感情表現は少ないが一途', '行動で愛情を示す', 'ベタベタより「並んで一緒にいる」関係が理想'],
+    dateStyle: ['派手さより実用性', 'インドアデートが好き', '静かな場所も好き', '好意は行動で受け止める', '長時間のデートは苦手', '体験型より深い会話を望む'],
+    relationship: ['"依存ゼロ×信頼100"の静かな同盟関係', 'ベタベタしなくても関係は安定している', '連絡頻度より"信頼度"を重視している', '干渉されないとむしろ愛を感じる', '問題が起きたら感情より解決策を話し合う', '大きな喧嘩は少ないが、静かに距離を取ることはある', '言葉少なめでも行動は一貫している', '「尊重されているか」が最重要ポイント', '自立している相手だと長続きする', '一度信頼が固まると、とても堅い絆になる'],
+  },
+};
+const MASTER_SOURCE = 'FANTS パーソナル恋愛式学 継承マスター講座資料より';
+
 // avatarフォルダのPNGを参照（差し替え可能）。読み込み失敗時は絵文字にフォールバック
 function iconImg(t, cls){
   const c = cls ? `icon ${cls}` : 'icon';
@@ -278,7 +373,7 @@ function renderRoster(){
     const r = rarityOf(t);
     const d = document.createElement('div');
     d.className = 'pc-card';
-    d.innerHTML = `${iconImg(t)}<div class="name">${t.code}</div>
+    d.innerHTML = `${iconImg(t)}<div class="name">${t.code}${MASTER_TRAITS[t.code] ? '<span class="mt-badge" title="継承マスター資料の詳細特性あり">📜</span>' : ''}</div>
       <div class="elem">${BASE[t.p].name}×${BASE[t.s].name}</div>
       <div class="stars">${starStr(r)}</div>`;
     d.onclick = () => openDetail(idx);
@@ -308,7 +403,39 @@ function openDetail(idx){
       <div style="grid-column:1/-1"><div class="lbl">弱点（NG行動）</div>
         <div>${weak.map(x=>`<span class="tag">${x}</span>`).join('')}</div></div>
       <div style="grid-column:1/-1"><div class="lbl">刺さる殺し文句</div><div class="val">${BASE[t.p].phrase}</div></div>
-    </div>`;
+    </div>
+    ${renderMasterTraits(t)}`;
+}
+
+function traitList(items){
+  return `<ul class="mt-list">${items.map(x=>`<li>${x}</li>`).join('')}</ul>`;
+}
+function traitValueList(items){
+  return `<div class="mt-values">${items.map(x=>
+    typeof x === 'string'
+      ? `<div class="mt-value"><div class="mt-value-t">${x}</div></div>`
+      : `<div class="mt-value"><div class="mt-value-t">${x.t}</div><div class="mt-value-d">${x.d}</div></div>`
+  ).join('')}</div>`;
+}
+function traitWordBlock(groups){
+  return groups.map(g => `<div class="mt-wordcat"><div class="mt-wordcat-t">${g.cat}</div>${g.items.map(w=>`<span class="tag">${w}</span>`).join('')}</div>`).join('');
+}
+function renderMasterTraits(t){
+  const m = MASTER_TRAITS[t.code];
+  if(!m) return '';
+  let html = `<div class="mt-wrap"><div class="mt-heading">📜 継承マスター資料｜詳細特性</div>`;
+  if(m.personality) html += `<div class="mt-section"><div class="mt-title">性格</div>${traitList(m.personality)}</div>`;
+  if(m.values) html += `<div class="mt-section"><div class="mt-title">価値観</div>${traitValueList(m.values)}</div>`;
+  if(m.communication) html += `<div class="mt-section"><div class="mt-title">コミュニケーションあるある</div>${traitList(m.communication)}</div>`;
+  if(m.strengths) html += `<div class="mt-section"><div class="mt-title">長所あるある</div>${traitList(m.strengths)}</div>`;
+  if(m.weaknesses) html += `<div class="mt-section"><div class="mt-title">短所あるある</div>${traitList(m.weaknesses)}</div>`;
+  if(m.loveView) html += `<div class="mt-section"><div class="mt-title">恋愛観あるある</div>${traitList(m.loveView)}</div>`;
+  if(m.dateStyle) html += `<div class="mt-section"><div class="mt-title">デートあるある</div>${traitList(m.dateStyle)}</div>`;
+  if(m.relationship) html += `<div class="mt-section"><div class="mt-title">関係性あるある</div>${traitList(m.relationship)}</div>`;
+  if(m.okWords) html += `<div class="mt-section"><div class="mt-title">💚 刺さるOKワード</div>${traitWordBlock(m.okWords)}</div>`;
+  if(m.ngWords) html += `<div class="mt-section"><div class="mt-title">🚫 避けたいNGワード</div>${traitWordBlock(m.ngWords)}</div>`;
+  html += `<div class="mt-source">${MASTER_SOURCE}</div></div>`;
+  return html;
 }
 function closeDetail(){
   document.getElementById('detailWrap').style.display = 'none';
