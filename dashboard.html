@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>LOVEQUEST MASTERS | RPGダッシュボード</title>
+<link rel="icon" href="assets/icon.png">
+<link rel="apple-touch-icon" href="assets/icon.png">
 <style>
 :root{
   --bg:#0D0D1A; --card:#1A1A35; --card2:#12122A;
@@ -41,8 +43,10 @@ body{font-family:'Yu Gothic UI','Hiragino Sans','Meiryo',sans-serif;
 /* ─── HEADER ─── */
 header{background:linear-gradient(135deg,#0D0D1A 0%,#1A0D2E 100%);
   border-bottom:1px solid #2a2a4a;padding:10px 16px;
-  display:flex;align-items:center;justify-content:space-between}
-.logo{font-size:18px;font-weight:900;letter-spacing:2px;color:var(--gold)}
+  display:flex;align-items:center}
+.hdr-side{flex:1;display:flex;align-items:center;gap:8px}
+.hdr-side.right{justify-content:flex-end}
+.logo{flex-shrink:0;font-size:18px;font-weight:900;letter-spacing:2px;color:var(--gold);white-space:nowrap}
 .logo span{color:var(--white)}
 .hdr-right{display:flex;gap:8px;align-items:center}
 .demo-btn{font-size:11px;padding:5px 10px;border-radius:8px;
@@ -59,6 +63,10 @@ main{display:grid;grid-template-columns:220px 1fr 280px;gap:12px;
   #quest-panel{grid-column:1/-1}}
 @media(max-width:540px){main{grid-template-columns:1fr}
   #quest-panel{grid-column:auto}}
+@media(max-width:600px){
+  .portal-back{padding:6px 10px;font-size:10px}
+  .portal-back .pb-txt{display:none}
+}
 
 /* ─── PANEL ─── */
 .panel{background:var(--card);border:1px solid #2a2a4a;border-radius:14px;
@@ -134,11 +142,13 @@ main{display:grid;grid-template-columns:220px 1fr 280px;gap:12px;
 
 <!-- Header -->
 <header>
-  <a class="portal-back" href="index.html">← ポータルへ戻る</a>
+  <div class="hdr-side left"><a class="portal-back" href="index.html">← <span class="pb-txt">ポータルへ戻る</span></a></div>
   <div class="logo">LOVE<span>QUEST</span> <span style="font-size:12px;color:var(--muted)">MASTERS</span></div>
-  <div class="hdr-right">
-    <button class="demo-btn" onclick="loadDemo()">⚡ デモデータ</button>
-    <button class="reset-btn" onclick="resetAll()">🔄 リセット</button>
+  <div class="hdr-side right">
+    <div class="hdr-right">
+      <button class="demo-btn" onclick="loadDemo()">⚡ デモデータ</button>
+      <button class="reset-btn" onclick="resetAll()">🔄 リセット</button>
+    </div>
   </div>
 </header>
 
