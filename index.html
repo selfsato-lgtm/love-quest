@@ -55,6 +55,12 @@ body{font-family:'Yu Gothic UI','Hiragino Sans','Meiryo',sans-serif;
   display:flex;align-items:center;gap:6px;backdrop-filter:blur(4px)}
 .sound-toggle:hover{border-color:var(--gold)}
 
+.reload-btn{position:absolute;top:58px;right:16px;z-index:10;
+  background:rgba(18,18,42,.7);border:1px solid #3a3a5a;border-radius:20px;
+  padding:8px 16px;font-size:12px;color:var(--light);cursor:pointer;
+  display:flex;align-items:center;gap:6px;backdrop-filter:blur(4px)}
+.reload-btn:hover{border-color:var(--gold)}
+
 .scroll-hint{margin-top:22px;font-size:12px;color:var(--white);cursor:pointer;
   padding:6px 14px;animation:bob 1.8s ease-in-out infinite;
   -webkit-tap-highlight-color:transparent}
@@ -90,6 +96,7 @@ footer{text-align:center;font-size:10.5px;color:#555570;padding:12px 20px}
 
 <div class="hero">
   <button class="sound-toggle" id="soundToggle">🔇 BGM: OFF</button>
+  <button class="reload-btn" id="reloadBtn">🔄 RELOAD</button>
   <video class="hero-video" autoplay muted loop playsinline>
     <source src="assets/dragon.mp4" type="video/mp4">
   </video>
@@ -173,6 +180,11 @@ footer{text-align:center;font-size:10.5px;color:#555570;padding:12px 20px}
 // スクロールヒント: クリックで「冒険の書」セクションを画面先頭にスクロール
 document.getElementById('scrollHint').addEventListener('click', () => {
   document.getElementById('questSection').scrollIntoView({behavior:'smooth', block:'start'});
+});
+
+// リロードボタン(ホーム画面追加時のスタンドアロン表示にはブラウザのリロードUIがないため)
+document.getElementById('reloadBtn').addEventListener('click', () => {
+  location.href = location.pathname + '?t=' + Date.now();
 });
 
 // BGM トグル(デフォルトミュート)
