@@ -53,7 +53,8 @@ body{font-family:'Yu Gothic UI','Hiragino Sans','Meiryo',sans-serif;
   border:1px solid transparent}
 .side-item:hover{background:var(--card)}
 .side-item.active{background:var(--gold);color:var(--bg);font-weight:700}
-.side-item .icon{font-size:14px;flex-shrink:0}
+.side-item .icon{width:18px;height:18px;object-fit:contain;border-radius:4px;flex-shrink:0}
+.side-item .icon.icon-fallback{font-size:14px;width:auto;height:auto}
 .side-item .name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* main */
@@ -65,11 +66,13 @@ body{font-family:'Yu Gothic UI','Hiragino Sans','Meiryo',sans-serif;
 .home-item{background:var(--card);border:1px solid #2a2a4a;border-radius:12px;padding:12px 4px;
   text-align:center;cursor:pointer}
 .home-item:hover{border-color:var(--gold)}
-.home-item .icon{font-size:24px}
+.home-item .icon{display:block;margin:0 auto;width:34px;height:34px;object-fit:contain;border-radius:8px}
+.home-item .icon.icon-fallback{font-size:24px;width:auto;height:auto}
 .home-item .name{font-size:10.5px;margin-top:4px}
 
 .welcome{text-align:center;margin-bottom:18px}
-.welcome .w-icon{font-size:44px}
+.welcome .w-icon{width:56px;height:56px;object-fit:contain;border-radius:10px;margin:0 auto}
+.welcome .w-icon.icon-fallback{font-size:44px;width:auto;height:auto}
 .welcome .w-title{font-size:16px;font-weight:900;color:var(--white);margin-top:6px}
 .welcome .w-sub{font-size:11.5px;color:var(--muted);margin-top:3px}
 
@@ -83,7 +86,8 @@ body{font-family:'Yu Gothic UI','Hiragino Sans','Meiryo',sans-serif;
 .toc-item:hover{background:var(--card2)}
 .toc-item.pending{opacity:.4;cursor:default}
 .toc-item .toc-num{color:var(--gold);font-weight:900;flex-shrink:0;min-width:16px}
-.toc-item .toc-icon{flex-shrink:0}
+.toc-item .toc-icon{flex-shrink:0;width:18px;height:18px;object-fit:contain;border-radius:4px}
+.toc-item .toc-icon.icon-fallback{width:auto;height:auto}
 .toc-item .toc-name{flex:1}
 .toc-item .toc-mark{font-size:10px;color:var(--muted);flex-shrink:0}
 .toc-more{display:block;margin:6px auto 2px;font-size:11px;padding:5px 16px;border-radius:14px;
@@ -240,12 +244,20 @@ body{font-family:'Yu Gothic UI','Hiragino Sans','Meiryo',sans-serif;
 
 <script>
 const TYPES = [
-  {code:'狂戦士',icon:'⚔️'}, {code:'勇者',icon:'🦸'}, {code:'魔法戦士',icon:'🧙'}, {code:'聖戦士',icon:'🛡️'},
-  {code:'姫',icon:'👸'}, {code:'騎士',icon:'🏇'}, {code:'盗賊',icon:'🗡️'}, {code:'妖精',icon:'🧚'},
-  {code:'シスター',icon:'🌿'}, {code:'兵士',icon:'🪖'}, {code:'牧師',icon:'📖'}, {code:'賢者',icon:'🦉'},
-  {code:'魔道士',icon:'🔮'}, {code:'忍者',icon:'🥷'}, {code:'道化師',icon:'🎭'}, {code:'占い師',icon:'⭐'},
+  {code:'狂戦士',icon:'⚔️',file:'kyousenshi'}, {code:'勇者',icon:'🦸',file:'yuusha'}, {code:'魔法戦士',icon:'🧙',file:'mahousenshi'}, {code:'聖戦士',icon:'🛡️',file:'seisenshi'},
+  {code:'姫',icon:'👸',file:'hime'}, {code:'騎士',icon:'🏇',file:'kishi'}, {code:'盗賊',icon:'🗡️',file:'touzoku'}, {code:'妖精',icon:'🧚',file:'yousei'},
+  {code:'シスター',icon:'🌿',file:'sister'}, {code:'兵士',icon:'🪖',file:'heishi'}, {code:'牧師',icon:'📖',file:'bokushi'}, {code:'賢者',icon:'🦉',file:'kenja'},
+  {code:'魔道士',icon:'🔮',file:'madoushi'}, {code:'忍者',icon:'🥷',file:'ninja'}, {code:'道化師',icon:'🎭',file:'doukeshi'}, {code:'占い師',icon:'⭐',file:'uranaishi'},
 ];
 const ICON_BY_NAME = Object.fromEntries(TYPES.map(t=>[t.code,t.icon]));
+const TYPE_BY_NAME = Object.fromEntries(TYPES.map(t=>[t.code,t]));
+
+// avatarフォルダのPNGを参照（差し替え可能）。読み込み失敗時は絵文字にフォールバック
+function iconImg(t, cls){
+  const c = cls ? `icon ${cls}` : 'icon';
+  return `<img class="${c}" src="avatar/${t.file}.png" alt="${t.code}" `
+    + `onerror="this.outerHTML='<span class=&quot;${c} icon-fallback&quot;>${t.icon}</span>'">`;
+}
 
 let LIBRARY = [];
 let PAIR_INDEX = {};
@@ -282,6 +294,7 @@ function goHome(){
   selA = null;
   selB = null;
   document.getElementById('topAvatar').textContent = '🔮';
+  document.getElementById('topAvatar').style.backgroundImage = '';
   document.getElementById('homeView').style.display = 'block';
   document.getElementById('typeView').style.display = 'none';
   renderSidebar();
@@ -294,7 +307,7 @@ function renderHomeGrid(){
   TYPES.forEach(t => {
     const d = document.createElement('div');
     d.className = 'home-item';
-    d.innerHTML = `<div class="icon">${t.icon}</div><div class="name">${t.code}</div>`;
+    d.innerHTML = `${iconImg(t)}<div class="name">${t.code}</div>`;
     d.onclick = () => selectType(t);
     grid.appendChild(d);
   });
@@ -317,7 +330,7 @@ function renderSidebar(){
   TYPES.forEach(t => {
     const d = document.createElement('div');
     d.className = 'side-item' + (selA && t.code===selA.code ? ' active' : '');
-    d.innerHTML = `<span class="icon">${t.icon}</span><span class="name">${t.code}</span>`;
+    d.innerHTML = `${iconImg(t)}<span class="name">${t.code}</span>`;
     d.onclick = () => selectType(t);
     list.appendChild(d);
   });
@@ -327,8 +340,12 @@ const TOC_COLLAPSE_LIMIT = 8;
 let tocExpanded = false;
 
 function renderWelcome(){
-  document.getElementById('welcomeIcon').textContent = selA.icon;
-  document.getElementById('topAvatar').textContent = selA.icon;
+  document.getElementById('welcomeIcon').outerHTML = iconImg(selA, 'w-icon').replace('class="icon w-icon"','class="icon w-icon" id="welcomeIcon"');
+  const topAv = document.getElementById('topAvatar');
+  topAv.textContent = '';
+  topAv.style.backgroundImage = `url('avatar/${selA.file}.png')`;
+  topAv.style.backgroundSize = 'cover';
+  topAv.style.backgroundPosition = 'center';
   document.getElementById('welcomeTitle').textContent = `${selA.code}タイプ の相性`;
   document.getElementById('tocOwnerName').textContent = selA.code;
   tocExpanded = false;
@@ -347,7 +364,7 @@ function renderTocList(){
     const exists = !!PAIR_INDEX[key];
     const item = document.createElement('div');
     item.className = 'toc-item' + (exists ? '' : ' pending');
-    item.innerHTML = `<span class="toc-num">${idx+1}</span><span class="toc-icon">${t.icon}</span>` +
+    item.innerHTML = `<span class="toc-num">${idx+1}</span>${iconImg(t,'toc-icon')}` +
       `<span class="toc-name">${selA.code} × ${t.code} タイプの相性</span>` +
       `<span class="toc-mark">${exists?'✓':'執筆中'}</span>`;
     if(exists){
@@ -417,7 +434,19 @@ function showEntry(){
   }
   document.getElementById('missing').style.display = 'none';
   document.getElementById('article').style.display = 'block';
-  document.getElementById('artAvatar').textContent = ICON_BY_NAME[entry.typeB] || '❓';
+  {
+    const artAv = document.getElementById('artAvatar');
+    const bType = TYPE_BY_NAME[entry.typeB];
+    if(bType){
+      artAv.textContent = '';
+      artAv.style.backgroundImage = `url('avatar/${bType.file}.png')`;
+      artAv.style.backgroundSize = 'cover';
+      artAv.style.backgroundPosition = 'center';
+    } else {
+      artAv.textContent = '❓';
+      artAv.style.backgroundImage = '';
+    }
+  }
   document.getElementById('artTitle').textContent = `${entry.typeA} × ${entry.typeB}`;
   const { html, headings } = renderContent(entry.content);
   document.getElementById('artBody').innerHTML = html;

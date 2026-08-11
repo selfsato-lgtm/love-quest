@@ -39,7 +39,8 @@ header p{font-size:11px;color:var(--muted);margin-top:3px}
 #view-roster{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
 .pc-card{background:var(--card);border:1px solid #2a2a4a;border-radius:12px;padding:12px;cursor:pointer;transition:.15s}
 .pc-card:hover{border-color:var(--gold);transform:translateY(-2px)}
-.pc-card .icon{font-size:34px;text-align:center}
+.pc-card .icon{display:block;margin:0 auto;width:44px;height:44px;object-fit:contain;border-radius:8px}
+.pc-card .icon.icon-fallback{font-size:34px;text-align:center;width:auto;height:auto}
 .pc-card .name{font-size:13px;font-weight:900;color:var(--white);text-align:center;margin-top:4px}
 .pc-card .elem{font-size:10px;color:var(--muted);text-align:center;margin-top:2px}
 .pc-card .stars{font-size:10px;text-align:center;margin-top:4px;color:var(--gold)}
@@ -47,7 +48,8 @@ header p{font-size:11px;color:var(--muted);margin-top:3px}
 /* ── DETAIL / PLAYER SHEET ── */
 .sheet{background:var(--card);border:1px solid #2a2a4a;border-radius:14px;padding:16px;margin-top:10px}
 .sheet-head{display:flex;align-items:center;gap:14px;border-bottom:1px solid #2a2a4a;padding-bottom:12px;margin-bottom:12px}
-.sheet-head .icon{font-size:48px}
+.sheet-head .icon{width:56px;height:56px;object-fit:contain;border-radius:10px;flex-shrink:0}
+.sheet-head .icon.icon-fallback{font-size:48px;width:auto;height:auto}
 .sheet-head .name{font-size:20px;font-weight:900;color:var(--gold)}
 .sheet-head .comp{font-size:12px;color:var(--muted)}
 .sheet-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 20px;font-size:12.5px}
@@ -63,7 +65,8 @@ header p{font-size:11px;color:var(--muted);margin-top:3px}
 .picker-row{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;margin:14px 0}
 .picker{background:var(--card);border:1px solid #2a2a4a;border-radius:12px;padding:10px 14px;
   display:flex;align-items:center;gap:8px;cursor:pointer;min-width:150px;justify-content:center}
-.picker .icon{font-size:26px}
+.picker .icon{width:32px;height:32px;object-fit:contain;border-radius:6px}
+.picker .icon.icon-fallback{font-size:26px;width:auto;height:auto}
 .picker .name{font-size:13px;font-weight:700}
 .vs{font-size:20px;color:var(--gold);font-weight:900}
 .go-btn{display:block;margin:0 auto;font-size:13px;padding:8px 24px;border-radius:20px;
@@ -77,14 +80,17 @@ header p{font-size:11px;color:var(--muted);margin-top:3px}
 .pick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
 .pick-item{background:var(--card2);border:1px solid #333;border-radius:8px;padding:8px 4px;text-align:center;cursor:pointer}
 .pick-item:hover{border-color:var(--gold)}
-.pick-item .icon{font-size:22px}
+.pick-item .icon{display:block;margin:0 auto;width:28px;height:28px;object-fit:contain;border-radius:6px}
+.pick-item .icon.icon-fallback{font-size:22px;width:auto;height:auto}
 .pick-item .name{font-size:9.5px;font-weight:700;margin-top:2px}
 
 /* ── COMPAT RESULT ── */
 #result{display:none}
 .compat-head{text-align:center;padding:14px;border-bottom:1px solid #2a2a4a;margin-bottom:14px}
 .compat-head .pair{font-size:15px;font-weight:900;color:var(--white)}
-.compat-head .icons{font-size:44px;margin:8px 0}
+.compat-head .icons{font-size:44px;margin:8px 0;display:flex;align-items:center;justify-content:center;gap:12px}
+.compat-head .icons .icon{width:56px;height:56px;object-fit:contain;border-radius:10px;vertical-align:middle}
+.compat-head .icons .icon.icon-fallback{font-size:44px;width:auto;height:auto}
 .stars-row{display:flex;justify-content:center;gap:24px;flex-wrap:wrap;margin-bottom:16px}
 .star-block{text-align:center}
 .star-block .lbl{font-size:10.5px;color:var(--muted)}
@@ -198,23 +204,30 @@ const BASE = {
 
 // ─── 16 TYPES = 主×副 ─────────────────────────────────
 const TYPES = [
-  {code:'狂戦士',icon:'⚔️',p:'SE',s:'SE'},
-  {code:'勇者',  icon:'🦸',p:'SE',s:'OD'},
-  {code:'魔法戦士',icon:'🧙',p:'SE',s:'MA'},
-  {code:'聖戦士',icon:'🛡️',p:'SE',s:'SO'},
-  {code:'姫',   icon:'👸',p:'OD',s:'OD'},
-  {code:'騎士',  icon:'🏇',p:'OD',s:'SE'},
-  {code:'盗賊',  icon:'🗡️',p:'OD',s:'MA'},
-  {code:'妖精',  icon:'🧚',p:'OD',s:'SO'},
-  {code:'シスター',icon:'🌿',p:'SO',s:'SO'},
-  {code:'兵士',  icon:'🪖',p:'SO',s:'SE'},
-  {code:'牧師',  icon:'📖',p:'SO',s:'OD'},
-  {code:'賢者',  icon:'🦉',p:'SO',s:'MA'},
-  {code:'魔道士',icon:'🔮',p:'MA',s:'MA'},
-  {code:'忍者',  icon:'🥷',p:'MA',s:'SE'},
-  {code:'道化師',icon:'🎭',p:'MA',s:'OD'},
-  {code:'占い師',icon:'⭐',p:'MA',s:'SO'},
+  {code:'狂戦士',icon:'⚔️',file:'kyousenshi',p:'SE',s:'SE'},
+  {code:'勇者',  icon:'🦸',file:'yuusha',p:'SE',s:'OD'},
+  {code:'魔法戦士',icon:'🧙',file:'mahousenshi',p:'SE',s:'MA'},
+  {code:'聖戦士',icon:'🛡️',file:'seisenshi',p:'SE',s:'SO'},
+  {code:'姫',   icon:'👸',file:'hime',p:'OD',s:'OD'},
+  {code:'騎士',  icon:'🏇',file:'kishi',p:'OD',s:'SE'},
+  {code:'盗賊',  icon:'🗡️',file:'touzoku',p:'OD',s:'MA'},
+  {code:'妖精',  icon:'🧚',file:'yousei',p:'OD',s:'SO'},
+  {code:'シスター',icon:'🌿',file:'sister',p:'SO',s:'SO'},
+  {code:'兵士',  icon:'🪖',file:'heishi',p:'SO',s:'SE'},
+  {code:'牧師',  icon:'📖',file:'bokushi',p:'SO',s:'OD'},
+  {code:'賢者',  icon:'🦉',file:'kenja',p:'SO',s:'MA'},
+  {code:'魔道士',icon:'🔮',file:'madoushi',p:'MA',s:'MA'},
+  {code:'忍者',  icon:'🥷',file:'ninja',p:'MA',s:'SE'},
+  {code:'道化師',icon:'🎭',file:'doukeshi',p:'MA',s:'OD'},
+  {code:'占い師',icon:'⭐',file:'uranaishi',p:'MA',s:'SO'},
 ];
+
+// avatarフォルダのPNGを参照（差し替え可能）。読み込み失敗時は絵文字にフォールバック
+function iconImg(t, cls){
+  const c = cls ? `icon ${cls}` : 'icon';
+  return `<img class="${c}" src="avatar/${t.file}.png" alt="${t.code}" `
+    + `onerror="this.outerHTML='<span class=&quot;${c} icon-fallback&quot;>${t.icon}</span>'">`;
+}
 
 // ─── RANK TABLE（個別認識学2021マスター準拠）1=最良 4=最弱 ───
 const RANK = {
@@ -265,7 +278,7 @@ function renderRoster(){
     const r = rarityOf(t);
     const d = document.createElement('div');
     d.className = 'pc-card';
-    d.innerHTML = `<div class="icon">${t.icon}</div><div class="name">${t.code}</div>
+    d.innerHTML = `${iconImg(t)}<div class="name">${t.code}</div>
       <div class="elem">${BASE[t.p].name}×${BASE[t.s].name}</div>
       <div class="stars">${starStr(r)}</div>`;
     d.onclick = () => openDetail(idx);
@@ -282,7 +295,7 @@ function openDetail(idx){
   const loc = blendTraits(t,'loc',3,2), like = blendTraits(t,'like',3,2), weak = blendTraits(t,'weak',3,2);
   document.getElementById('detailSheet').innerHTML = `
     <div class="sheet-head">
-      <span class="icon">${t.icon}</span>
+      ${iconImg(t)}
       <div><div class="name">${t.code}</div><div class="comp">${BASE[t.p].name}(主) × ${BASE[t.s].name}(副)</div></div>
     </div>
     <div class="sheet-grid">
@@ -323,7 +336,7 @@ function openPick(target){
   TYPES.forEach(t => {
     const d = document.createElement('div');
     d.className = 'pick-item';
-    d.innerHTML = `<div class="icon">${t.icon}</div><div class="name">${t.code}</div>`;
+    d.innerHTML = `${iconImg(t)}<div class="name">${t.code}</div>`;
     d.onclick = () => { if(target==='A') selA=t; else selB=t; updatePickers(); closePick(); };
     g.appendChild(d);
   });
@@ -332,9 +345,9 @@ function openPick(target){
 function closePick(){ document.getElementById('pickModal').style.display = 'none'; }
 document.getElementById('pickModal').onclick = (e) => { if(e.target.id==='pickModal') closePick(); };
 function updatePickers(){
-  document.getElementById('pickA-icon').textContent = selA.icon;
+  document.getElementById('pickA-icon').outerHTML = iconImg(selA).replace('class="icon"','class="icon" id="pickA-icon"');
   document.getElementById('pickA-name').textContent = selA.code;
-  document.getElementById('pickB-icon').textContent = selB.icon;
+  document.getElementById('pickB-icon').outerHTML = iconImg(selB).replace('class="icon"','class="icon" id="pickB-icon"');
   document.getElementById('pickB-name').textContent = selB.code;
 }
 
@@ -344,8 +357,8 @@ function renderCompat(){
   const total = Math.round((calcStars(A,B,'work')+calcStars(A,B,'love')+calcStars(A,B,'marriage'))/3);
   const love = calcStars(A,B,'love'), marriage = calcStars(A,B,'marriage'), line = lineStars(A,B);
 
-  document.getElementById('rA-icon').textContent = A.icon;
-  document.getElementById('rB-icon').textContent = B.icon;
+  document.getElementById('rA-icon').outerHTML = iconImg(A).replace('class="icon"','class="icon" id="rA-icon"');
+  document.getElementById('rB-icon').outerHTML = iconImg(B).replace('class="icon"','class="icon" id="rB-icon"');
   document.getElementById('r-pair').textContent = `【${A.code}】 × 【${B.code}】`;
   document.getElementById('s-total').textContent = starStr(total);
   document.getElementById('s-love').textContent = starStr(love);

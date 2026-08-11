@@ -33,7 +33,8 @@ body{font-family:'Yu Gothic UI','Hiragino Sans','Meiryo',sans-serif;
 .av-card{background:var(--card);border:1.5px solid #333;border-radius:10px;
   padding:10px 6px;text-align:center;cursor:pointer;transition:.15s}
 .av-card:hover{transform:translateY(-3px);border-color:var(--gold)}
-.av-card .av-icon{font-size:28px;line-height:1.1}
+.av-card .av-icon{display:block;margin:0 auto;width:38px;height:38px;object-fit:contain;border-radius:8px}
+.av-card .av-icon.icon-fallback{font-size:28px;line-height:1.1;width:auto;height:auto}
 .av-card .av-name{font-size:11px;font-weight:700;margin-top:5px;color:var(--white)}
 .av-card.se{border-color:#333} .av-card.se:hover{border-color:var(--se)}
 .av-card.od{border-color:#333} .av-card.od:hover{border-color:var(--od)}
@@ -74,7 +75,8 @@ main{display:grid;grid-template-columns:220px 1fr 280px;gap:12px;
 
 /* ─── AVATAR PANEL ─── */
 #avatar-panel{text-align:center}
-.av-display{font-size:62px;line-height:1;margin:8px 0}
+.av-display{width:88px;height:88px;object-fit:contain;border-radius:14px;margin:8px auto;display:block}
+.av-display.icon-fallback{font-size:62px;line-height:1;width:auto;height:auto}
 .av-title{font-size:16px;font-weight:900;color:var(--gold)}
 .av-sub{font-size:11px;color:var(--muted);margin-top:2px}
 .change-btn{font-size:11px;padding:4px 10px;border-radius:8px;margin-top:8px;
@@ -192,23 +194,30 @@ main{display:grid;grid-template-columns:220px 1fr 280px;gap:12px;
 <script>
 // ─── DATA ───────────────────────────────────────────
 const AVATARS = [
-  {name:'狂戦士',icon:'⚔️',type:'se',sub:'戦士ド直球'},
-  {name:'勇者',  icon:'🦸',type:'se',sub:'戦士 × 踊り子'},
-  {name:'魔法戦士',icon:'🧙',type:'se',sub:'戦士 × 魔法使い'},
-  {name:'聖戦士',icon:'🛡️',type:'se',sub:'戦士 × 僧侶'},
-  {name:'姫',   icon:'👸',type:'od',sub:'踊り子ド直球'},
-  {name:'騎士',  icon:'🏇',type:'od',sub:'踊り子 × 戦士'},
-  {name:'盗賊',  icon:'🗡️',type:'od',sub:'踊り子 × 魔法使い'},
-  {name:'妖精',  icon:'🧚',type:'od',sub:'踊り子 × 僧侶'},
-  {name:'シスター',icon:'🌿',type:'so',sub:'僧侶ド直球'},
-  {name:'兵士',  icon:'🪖',type:'so',sub:'僧侶 × 戦士'},
-  {name:'牧師',  icon:'📖',type:'so',sub:'僧侶 × 踊り子'},
-  {name:'賢者',  icon:'🦉',type:'so',sub:'僧侶 × 魔法使い'},
-  {name:'魔道士',icon:'🔮',type:'ma',sub:'魔法使いド直球'},
-  {name:'忍者',  icon:'🥷',type:'ma',sub:'魔法使い × 戦士'},
-  {name:'道化師',icon:'🎭',type:'ma',sub:'魔法使い × 踊り子'},
-  {name:'占い師',icon:'⭐',type:'ma',sub:'魔法使い × 僧侶'},
+  {name:'狂戦士',icon:'⚔️',file:'kyousenshi',type:'se',sub:'戦士ド直球'},
+  {name:'勇者',  icon:'🦸',file:'yuusha',type:'se',sub:'戦士 × 踊り子'},
+  {name:'魔法戦士',icon:'🧙',file:'mahousenshi',type:'se',sub:'戦士 × 魔法使い'},
+  {name:'聖戦士',icon:'🛡️',file:'seisenshi',type:'se',sub:'戦士 × 僧侶'},
+  {name:'姫',   icon:'👸',file:'hime',type:'od',sub:'踊り子ド直球'},
+  {name:'騎士',  icon:'🏇',file:'kishi',type:'od',sub:'踊り子 × 戦士'},
+  {name:'盗賊',  icon:'🗡️',file:'touzoku',type:'od',sub:'踊り子 × 魔法使い'},
+  {name:'妖精',  icon:'🧚',file:'yousei',type:'od',sub:'踊り子 × 僧侶'},
+  {name:'シスター',icon:'🌿',file:'sister',type:'so',sub:'僧侶ド直球'},
+  {name:'兵士',  icon:'🪖',file:'heishi',type:'so',sub:'僧侶 × 戦士'},
+  {name:'牧師',  icon:'📖',file:'bokushi',type:'so',sub:'僧侶 × 踊り子'},
+  {name:'賢者',  icon:'🦉',file:'kenja',type:'so',sub:'僧侶 × 魔法使い'},
+  {name:'魔道士',icon:'🔮',file:'madoushi',type:'ma',sub:'魔法使いド直球'},
+  {name:'忍者',  icon:'🥷',file:'ninja',type:'ma',sub:'魔法使い × 戦士'},
+  {name:'道化師',icon:'🎭',file:'doukeshi',type:'ma',sub:'魔法使い × 踊り子'},
+  {name:'占い師',icon:'⭐',file:'uranaishi',type:'ma',sub:'魔法使い × 僧侶'},
 ];
+
+// avatarフォルダのPNGを参照（差し替え可能）。読み込み失敗時は絵文字にフォールバック
+function iconImg(t, cls){
+  const c = cls ? `icon ${cls}` : 'icon';
+  return `<img class="${c}" src="avatar/${t.file}.png" alt="${t.name}" `
+    + `onerror="this.outerHTML='<span class=&quot;${c} icon-fallback&quot;>${t.icon}</span>'">`;
+}
 
 const STATS = [
   {key:'外見力', icon:'✨', color:'#E94560', desc:'ファッション・清潔感・雰囲気'},
@@ -257,7 +266,7 @@ function statLv(v){ return Math.min(10,Math.floor(v/10)+1); }
 // ─── RENDER ─────────────────────────────────────────
 function renderAvatar(){
   const av = AVATARS[state.avatarIdx];
-  document.getElementById('av-icon').textContent = av.icon;
+  document.getElementById('av-icon').outerHTML = iconImg(av, 'av-display').replace('class="icon av-display"','class="icon av-display" id="av-icon"');
   document.getElementById('av-name').textContent = av.name;
   document.getElementById('av-sub').textContent  = av.sub;
 }
@@ -370,7 +379,7 @@ function buildModal(){
   AVATARS.forEach((av,i) => {
     const d = document.createElement('div');
     d.className = `av-card ${av.type}`;
-    d.innerHTML = `<div class="av-icon">${av.icon}</div><div class="av-name">${av.name}</div>`;
+    d.innerHTML = `${iconImg(av,'av-icon')}<div class="av-name">${av.name}</div>`;
     d.onclick = () => selectAvatar(i);
     g.appendChild(d);
   });
