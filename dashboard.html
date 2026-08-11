@@ -105,6 +105,14 @@ main{display:grid;grid-template-columns:220px 1fr 280px;gap:12px;
 .adj-btn:hover{background:#333;color:var(--white)}
 .stat-desc{font-size:10px;color:var(--muted);margin-top:2px}
 
+.radar-wrap{margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid #2a2a4a}
+.radar-svg{width:100%;height:auto;display:block;max-width:260px;margin:0 auto}
+.radar-legend{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.radar-legend-row{display:flex;align-items:center;gap:8px}
+.radar-legend-row .stat-name{flex:1}
+.radar-legend-row .stat-adj{margin-top:0}
+.stats-sub-heading{font-size:11px;color:var(--muted);font-weight:700;margin-bottom:10px;letter-spacing:.5px}
+
 /* ─── QUESTS ─── */
 #quest-panel h3{font-size:13px;font-weight:700;color:var(--white);margin-bottom:10px}
 .q-item{display:flex;align-items:flex-start;gap:10px;padding:9px 10px;
@@ -219,12 +227,25 @@ function iconImg(t, cls){
     + `onerror="this.outerHTML='<span class=&quot;${c} icon-fallback&quot;>${t.icon}</span>'">`;
 }
 
-const STATS = [
+const RADAR_STATS = [
   {key:'外見力', icon:'✨', color:'#E94560', desc:'ファッション・清潔感・雰囲気'},
   {key:'デート力',icon:'🗺️',color:'#F5A623', desc:'デート企画・場の演出力'},
   {key:'魅了力', icon:'💫', color:'#7B5EA7', desc:'会話・印象・トキメキを生む力'},
   {key:'コミュ力',icon:'💬',color:'#4CAF73', desc:'タイプ読み・共感・アプローチ'},
 ];
+// レーダーチャート対象外の追加ステータス
+const EXTRA_STATS = [
+  {key:'表現力', icon:'🎤', color:'#E94560', desc:'気持ちや考えを言葉・態度で伝える力'},
+  {key:'楽転力', icon:'🔄', color:'#F5A623', desc:'落ち込みや失敗を前向きに切り替える力'},
+  {key:'共感力', icon:'🤝', color:'#4CAF73', desc:'相手の気持ちに寄り添い理解する力'},
+  {key:'行動力', icon:'🏃', color:'#4A9EDB', desc:'迷わず一歩を踏み出す力'},
+  {key:'包容力', icon:'🌿', color:'#7B5EA7', desc:'相手をありのまま受け止める力'},
+  {key:'認識力', icon:'👁️', color:'#E94560', desc:'自分や相手の状態を客観的に把握する力'},
+  {key:'継続力', icon:'🔥', color:'#F5A623', desc:'コツコツ続け、習慣化する力'},
+  {key:'分析力', icon:'🧠', color:'#4CAF73', desc:'状況やタイプを見極め、要因を分解する力'},
+  {key:'メンタル',icon:'🛡️',color:'#4A9EDB', desc:'落ち込みや失恋から立て直す精神力'},
+];
+const STATS = [...RADAR_STATS, ...EXTRA_STATS];
 
 const QUESTS = [
   {name:'タイプ診断マスター',   desc:'恋愛式学16タイプを理解する', icon:'🔮',xp:100, reward:{コミュ力:15,魅了力:10}},
@@ -246,7 +267,7 @@ const LV_RANKS = ['見習い冒険者','新米冒険者','駆け出し冒険者'
 // ─── STATE ──────────────────────────────────────────
 let state = {
   avatarIdx: 2,
-  stats: {外見力:0,デート力:0,魅了力:0,コミュ力:0},
+  stats: Object.fromEntries(STATS.map(s => [s.key, 0])),
   done: [],
 };
 function save(){ localStorage.setItem('lqm', JSON.stringify(state)); }
@@ -283,10 +304,64 @@ function renderOverall(){
   document.getElementById('xp-txt').textContent   = xp + ' / ' + nxt + ' XP';
 }
 
+function radarSVG(){
+  const size = 220, cx = size/2, cy = size/2, r = 80;
+  const n = RADAR_STATS.length;
+  const angle = i => (Math.PI*2/n)*i - Math.PI/2;
+  const pt = (i, frac) => [cx + Math.cos(angle(i))*r*frac, cy + Math.sin(angle(i))*r*frac];
+  let rings = '';
+  [0.25,0.5,0.75,1].forEach(frac => {
+    const pts = RADAR_STATS.map((_,i)=>pt(i,frac).join(',')).join(' ');
+    rings += `<polygon points="${pts}" fill="none" stroke="#2a2a4a" stroke-width="1"/>`;
+  });
+  let axes = '';
+  RADAR_STATS.forEach((_,i) => {
+    const [x,y] = pt(i,1);
+    axes += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#2a2a4a" stroke-width="1"/>`;
+  });
+  const dataPts = RADAR_STATS.map((st,i)=>pt(i, Math.min(100,state.stats[st.key]||0)/100).join(',')).join(' ');
+  let labels = '';
+  RADAR_STATS.forEach((st,i) => {
+    const [x,y] = pt(i,1.28);
+    const val = Math.min(100, state.stats[st.key]||0);
+    labels += `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="middle"
+      font-size="11" fill="${st.color}" font-weight="700">${st.icon} ${st.key}</text>
+      <text x="${x}" y="${y+13}" text-anchor="middle" font-size="9" fill="#8888AA">${val}</text>`;
+  });
+  return `<svg viewBox="0 0 ${size} ${size+16}" class="radar-svg">
+    <g transform="translate(0,8)">
+      ${rings}${axes}
+      <polygon points="${dataPts}" fill="rgba(245,166,35,.28)" stroke="var(--gold)" stroke-width="2"/>
+      ${labels}
+    </g>
+  </svg>`;
+}
+
 function renderStats(){
   const c = document.getElementById('stats-container');
   c.innerHTML = '';
-  STATS.forEach(st => {
+
+  const radarWrap = document.createElement('div');
+  radarWrap.className = 'radar-wrap';
+  radarWrap.innerHTML = radarSVG() + `<div class="radar-legend">${RADAR_STATS.map(st => {
+    const val = Math.min(100, state.stats[st.key]||0);
+    return `<div class="radar-legend-row">
+      <span class="stat-name">${st.icon} ${st.key}</span>
+      <span class="stat-lv" style="color:${st.color}">Lv.${statLv(val)}</span>
+      <div class="stat-adj">
+        <button class="adj-btn" onclick="adjStat('${st.key}',-10)">−10</button>
+        <button class="adj-btn" onclick="adjStat('${st.key}',+10)">+10</button>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+  c.appendChild(radarWrap);
+
+  const extraHeading = document.createElement('div');
+  extraHeading.className = 'stats-sub-heading';
+  extraHeading.textContent = '追加ステータス';
+  c.appendChild(extraHeading);
+
+  EXTRA_STATS.forEach(st => {
     const val  = Math.min(100, state.stats[st.key] || 0);
     const lv   = statLv(val);
     const div  = document.createElement('div');
