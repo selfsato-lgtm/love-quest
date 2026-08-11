@@ -23,8 +23,8 @@ body{font-family:'Yu Gothic UI','Hiragino Sans','Meiryo',sans-serif;
 .hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
 
 @media(max-width:600px){
-  /* 動画の実サイズ(1080x1920=9:16)にコンテナを正確に合わせ、歪み・過度なクロップなしで縦長表示する */
-  .hero{height:auto;aspect-ratio:9/16;min-height:auto;max-height:none}
+  /* 画面のほぼ全高まで動画エリアを拡張し、下に黒い余白が残らないようにする */
+  .hero{height:90vh;min-height:600px;max-height:none}
 }
 
 .hero-scrim{position:absolute;inset:0;z-index:2;
