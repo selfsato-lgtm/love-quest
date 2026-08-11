@@ -31,9 +31,6 @@ body{font-family:'Yu Gothic UI','Hiragino Sans','Meiryo',sans-serif;
   /* 動画は上部が暗い夜空・ドラゴンは下寄りの構図のため、ズーム+下寄せで
      ドラゴンが画面に大きく収まるようにクロップ位置を調整する */
   .hero-video{transform:scale(1.55);transform-origin:center 78%}
-  /* コンテンツを中央でなく下寄せにして、scrollヒントと下の冒険の書セクションの間の余白を詰める */
-  .hero-content{justify-content:flex-end;padding-bottom:24px}
-  .wrap{padding-top:0}
 }
 
 .hero-scrim{position:absolute;inset:0;z-index:2;
@@ -41,6 +38,12 @@ body{font-family:'Yu Gothic UI','Hiragino Sans','Meiryo',sans-serif;
 
 .hero-content{position:relative;z-index:5;height:100%;display:flex;flex-direction:column;
   align-items:center;justify-content:center;text-align:center;padding:0 16px}
+
+@media(max-width:600px){
+  /* コンテンツを中央でなく下寄せにして、scrollヒントと下の冒険の書セクションの間の余白を詰める */
+  .hero-content{justify-content:flex-end;padding-bottom:24px}
+  .wrap{padding-top:0}
+}
 .hero-title{font-size:clamp(30px,7vw,54px);font-weight:900;color:var(--gold);
   letter-spacing:2px;text-shadow:0 0 24px rgba(245,166,35,.5)}
 .hero-sub{font-size:13px;color:var(--muted);margin-top:10px;letter-spacing:3px}
