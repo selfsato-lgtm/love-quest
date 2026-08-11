@@ -150,6 +150,18 @@ toggle.addEventListener('click', () => {
     toggle.textContent = '🔇 BGM: OFF';
   }
 });
+
+// ── 一時デバッグ表示（確認後に削除予定） ──
+(function(){
+  const d = document.createElement('div');
+  d.style.cssText = 'position:fixed;bottom:8px;left:8px;z-index:999;background:rgba(255,0,0,.85);color:#fff;font-size:11px;padding:6px 10px;border-radius:8px;font-family:monospace';
+  function update(){
+    d.textContent = 'w=' + window.innerWidth + ' h=' + window.innerHeight + ' dpr=' + window.devicePixelRatio;
+  }
+  update();
+  window.addEventListener('resize', update);
+  document.body.appendChild(d);
+})();
 </script>
 </body>
 </html>
