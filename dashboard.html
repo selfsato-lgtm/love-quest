@@ -642,7 +642,9 @@ function buildBookMarkdown(){
 }
 function saveBookFile(){
   const md = buildBookMarkdown();
-  const blob = new Blob([md], {type:'text/markdown;charset=utf-8'});
+  // text/markdownだとSafari等でプレビュー表示のみになりダウンロードされないことがあるため、
+  // 強制的に「ダウンロード」扱いにするMIMEタイプを使う
+  const blob = new Blob([md], {type:'application/octet-stream'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   const av = AVATARS[state.avatarIdx];
@@ -653,7 +655,8 @@ function saveBookFile(){
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
-  alert('冒険の書を保存しました📖\n' + a.download);
+  alert('冒険の書を保存しました📖\n' + a.download
+    + '\n\n【iPhoneの場合】「ダウンロード」をタップした後、標準では「ファイル」アプリの\n「このiPhone内」または「iCloud Drive」→「ダウンロード」フォルダに保存されます。\n保存先はSafariの「設定」→「Safari」→「ダウンロード」で変更できます。');
 }
 function loadBookFile(file){
   if(!file) return;
