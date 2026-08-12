@@ -22,6 +22,7 @@
   @media (max-width:820px){ .wrap{ grid-template-columns:1fr; } .panel{ position:static !important; } }
   .cat{ background:#fff; border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin-bottom:12px; }
   .cat h2{ font-size:14px; margin:2px 0 8px; }
+  .catnote{ font-size:11px; color:#8a6d1f; background:#fff8e1; border:1px solid #f0dca0; border-radius:8px; padding:6px 9px; margin-bottom:8px; line-height:1.5; }
   .chips{ display:flex; flex-wrap:wrap; gap:6px; }
   .chip{ font-size:12px; padding:6px 10px; border:1px solid #ccc; border-radius:16px; background:#fff; cursor:pointer; user-select:none; transition:.12s; }
   .chip:hover{ border-color:#888; }
@@ -107,7 +108,8 @@ const DATA = [
   ["アップの自撮りが多い",{SE:1,OD:1},11],
   ["映え背景(花畑・海・カフェ)込みの写真",{OD:2},12],
   ["動物・ペット・風景の写真",{SO:1.5},13],
-  ["友達との集合写真",{SO:1,OD:1},14]
+  ["友達との集合写真",{SO:1,OD:1},14],
+  ["SNSの更新頻度が高い",{OD:2},72]
  ]},
  {c:"👗 服装・見た目", items:[
   ["派手・個性的・ハイブランド",{SE:2},15],
@@ -118,7 +120,7 @@ const DATA = [
   ["黒髪",{MA:1,SO:.5},20],
   ["髪色明るめ",{OD:1,SE:1},21]
  ]},
- {c:"💼 職業", items:[
+ {c:"💼 職業", note:"⚠️職業による分類は100%絶対ではありません。置かれた役割によって後天的にその役割を演じているケースもあるため、あくまで本質キャラクターを導く「手がかり(ヒント)」とし、他のカテゴリと組み合わせて仮説を立ててください。", items:[
   ["経営・フリーランス・営業・管理職",{SE:2},22],
   ["警察・自衛隊・体育会系",{SE:2},23],
   ["接客・美容・アパレル・CA・イベント・芸能",{OD:2},24],
@@ -158,7 +160,9 @@ const DATA = [
   ["項目をきっちり分けて書いている",{MA:1.5},52],
   ["「仲良くなってから会いたい」",{SO:3},53],
   ["条件・NGをはっきり書いている",{MA:1,SE:.5},54],
-  ["「時間を大切に」「目的が同じ人と」",{SE:1.5,MA:.5},55]
+  ["「時間を大切に」「目的が同じ人と」",{SE:1.5,MA:.5},55],
+  ["抽象的な表現を使う",{MA:2},73],
+  ["常に学ぶ姿勢が伝わる",{SE:2},74]
  ]},
  {c:"💬 メッセージ・言動", items:[
   ["返信が短文で率直",{SE:1.5,MA:.5},56],
@@ -174,11 +178,15 @@ const DATA = [
   ["(対面)声が小さい・控えめ",{SO:1.5},66],
   ["甘え上手・かまってアピール",{OD:1.5},67],
   ["デート前に会うことに慎重・様子見",{SO:1.5,MA:.5},68],
-  ["「2回目も会いたい」と即OK",{MA:2,SE:.5},69]
+  ["「2回目も会いたい」と即OK",{MA:2,SE:.5},69],
+  ["初対面でも会話が弾む",{OD:2},75],
+  ["感謝をきちんと言葉にする",{SO:2},76],
+  ["落ち着いた場所で深い対話を好む",{MA:2},77],
+  ["妥協を嫌う・譲らない",{SE:2},78]
  ]}
 ];
 // ★ID(各itemの3番目)はビット位置=永久不変の背番号。カテゴリの範囲とは無関係。
-//   新項目は必ず未使用の最大ID+1を振ること(既存IDは絶対に変えない)。次の空きID=72。
+//   新項目は必ず未使用の最大ID+1を振ること(既存IDは絶対に変えない)。次の空きID=79。
 const TYPES={SE:"戦士",OD:"踊り子",SO:"僧侶",MA:"魔法使い"};
 const PURE={SE:["狂戦士","ESTJ","裏表ゼロの直球エネルギー。目標に一直線、アプローチもド直球。"],OD:["姫","ESFP","天真爛漫で愛され体質。協調性ありそうで実は「私が主役」。"],SO:["シスター","ISFJ","究極の癒しと献身。場の平和を静かに守る。"],MA:["魔道士","INTP","探求と論理の人。本質以外に興味なし。"]};
 const COMBO={"SE,OD":["勇者","ESTP","熱量と愛嬌のリーダー。みんなのために前進する人気者。"],"SE,MA":["魔法戦士","ENTJ","目標達成×分析思考。効率よく結果を出す指揮官。"],"SE,SO":["聖戦士","ENFJ","情熱と協調性の両立。仲間のために戦う。"],"OD,SE":["騎士","ENFP","ノリと行動力のムードメーカー。"],"OD,SO":["妖精","ESFJ","明るく優しい協調派。場を和ませる。"],"OD,MA":["盗賊","ENTP","愛嬌の裏に独自の世界観。天然で言葉選びが独特な二面性。"],"SO,SE":["兵士","INFJ","縁の下で支えつつ芯が強い。"],"SO,OD":["牧師","INFP","尽くす愛情派。YESマンで和を作るが本音を言えない。"],"SO,MA":["賢者","ISTJ","静かで誠実な知恵者。もめごとのない安定感。"],"MA,SE":["忍者","INTJ","静かな戦略家。3年5年10年の計画を着実に遂行。"],"MA,SO":["占い師","ISFP","一見太陽に見えるフェイク持ちの穏やかな観察者。掴みどころがない。"],"MA,OD":["道化師","ISTP","あざとさとセンスを操る知的エンターテイナー。"]};
@@ -192,7 +200,7 @@ const state=new Set();
 const main=document.getElementById("cats");
 DATA.forEach((cat,ci)=>{
   const d=document.createElement("div"); d.className="cat";
-  d.innerHTML=`<h2>${cat.c}</h2>`;
+  d.innerHTML=`<h2>${cat.c}</h2>` + (cat.note ? `<div class="catnote">${cat.note}</div>` : "");
   const ch=document.createElement("div"); ch.className="chips";
   cat.items.forEach((it,ii)=>{
     const b=document.createElement("span"); b.className="chip"; b.textContent=it[0];
