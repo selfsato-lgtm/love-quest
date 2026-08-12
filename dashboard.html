@@ -177,6 +177,7 @@ main{display:grid;grid-template-columns:220px 1fr 280px;gap:12px;
       <input type="file" id="bookFileInput" accept=".md,text/markdown" style="display:none" onchange="loadBookFile(this.files[0])">
       <button class="demo-btn" onclick="loadDemo()">⚡ デモデータ</button>
       <button class="reset-btn" onclick="resetAll()">🔄 リセット</button>
+      <button class="reset-btn" id="reloadBtn">🔄 RELOAD</button>
     </div>
   </div>
 </header>
@@ -694,6 +695,11 @@ function loadBookFile(file){
   reader.onerror = () => alert('ファイルの読み込みに失敗しました。');
   reader.readAsText(file, 'utf-8');
 }
+
+// リロードボタン(ホーム画面追加時のスタンドアロン表示にはブラウザのリロードUIがないため)
+document.getElementById('reloadBtn').addEventListener('click', () => {
+  location.href = location.pathname + '?t=' + Date.now();
+});
 
 // ─── INIT ────────────────────────────────────────────
 load();
