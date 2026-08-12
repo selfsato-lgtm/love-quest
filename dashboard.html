@@ -586,8 +586,10 @@ function loadDemo(){
   if(newLv > prevLv) showLevelUp(newLv);
 }
 function resetAll(){
+  if(!confirm('すべてのステータス・クエスト達成状況・チェックリストをリセットします。よろしいですか？\n（アバターの選択は保持されます）')) return;
   state = normalizeState({avatarIdx: state.avatarIdx});
   save(); renderAll();
+  alert('リセットしました🔄');
 }
 
 // ─── 冒険の書（ファイル保存・読込） ───────────────────
