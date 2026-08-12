@@ -674,7 +674,8 @@ async function saveBookFile(){
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
-  alert('冒険の書を保存しました📖\n' + filename + '\n（保存先: ダウンロードフォルダ）');
+  alert('冒険の書のダウンロードを開始しました📖\n' + filename
+    + '\n\nブラウザに表示される保存の確認・通知に従って完了してください（既定はダウンロードフォルダ）。');
 }
 function loadBookFile(file){
   if(!file) return;
