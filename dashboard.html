@@ -56,6 +56,12 @@ header{background:linear-gradient(135deg,#0D0D1A 0%,#1A0D2E 100%);
 .reset-btn{font-size:11px;padding:5px 10px;border-radius:8px;
   border:1px solid #444;background:transparent;color:var(--muted);cursor:pointer}
 .reset-btn:hover{background:#333;color:var(--white)}
+.save-btn{font-size:11px;padding:5px 10px;border-radius:8px;
+  border:1px solid var(--gold);background:transparent;color:var(--gold);cursor:pointer}
+.save-btn:hover{background:var(--gold);color:var(--bg)}
+.load-btn{font-size:11px;padding:5px 10px;border-radius:8px;
+  border:1px solid var(--blue);background:transparent;color:var(--blue);cursor:pointer}
+.load-btn:hover{background:var(--blue);color:var(--white)}
 
 /* ─── LAYOUT ─── */
 main{display:grid;grid-template-columns:220px 1fr 280px;gap:12px;
@@ -166,6 +172,9 @@ main{display:grid;grid-template-columns:220px 1fr 280px;gap:12px;
   <div class="logo">LOVE<span>QUEST</span> <span style="font-size:12px;color:var(--muted)">MASTERS</span></div>
   <div class="hdr-side right">
     <div class="hdr-right">
+      <button class="save-btn" onclick="saveBookFile()">📖 冒険の書を保存</button>
+      <button class="load-btn" onclick="document.getElementById('bookFileInput').click()">📂 読込</button>
+      <input type="file" id="bookFileInput" accept=".md,text/markdown" style="display:none" onchange="loadBookFile(this.files[0])">
       <button class="demo-btn" onclick="loadDemo()">⚡ デモデータ</button>
       <button class="reset-btn" onclick="resetAll()">🔄 リセット</button>
     </div>
@@ -308,16 +317,22 @@ let state = {
   done: [],
 };
 function save(){ localStorage.setItem('lqm', JSON.stringify(state)); }
+// 読み込んだstateに不足フィールドを補完する（旧セーブデータ・他バージョンの冒険の書ファイルにも対応）。
+// 今後ステータスやチェックリストが増減しても、ここを直せば読み込み側は壊れない。
+function normalizeState(s){
+  s = s && typeof s === 'object' ? s : {};
+  s.stats = Object.assign(Object.fromEntries(STATS.map(x => [x.key, 0])), s.stats || {});
+  if(typeof s.impassCount !== 'number') s.impassCount = 0;
+  if(typeof s.mindmapCount !== 'number') s.mindmapCount = 0;
+  if(!Array.isArray(s.manualDone)) s.manualDone = [];
+  if(!Array.isArray(s.done)) s.done = [];
+  if(typeof s.avatarIdx !== 'number') s.avatarIdx = 2;
+  return s;
+}
 function load(){
   const d = localStorage.getItem('lqm');
-  if(d){ state = JSON.parse(d); }
-  // 旧バージョンのセーブデータに無いフィールドを補完（未定義参照によるレンダリング停止を防ぐ）
-  state.stats = Object.assign(Object.fromEntries(STATS.map(s => [s.key, 0])), state.stats || {});
-  if(typeof state.impassCount !== 'number') state.impassCount = 0;
-  if(typeof state.mindmapCount !== 'number') state.mindmapCount = 0;
-  if(!Array.isArray(state.manualDone)) state.manualDone = [];
-  if(!Array.isArray(state.done)) state.done = [];
-  if(typeof state.avatarIdx !== 'number') state.avatarIdx = 2;
+  if(d){ try{ state = JSON.parse(d); }catch(e){} }
+  state = normalizeState(state);
 }
 
 // ─── LEVEL CALC ─────────────────────────────────────
@@ -571,8 +586,88 @@ function loadDemo(){
   if(newLv > prevLv) showLevelUp(newLv);
 }
 function resetAll(){
-  state = {avatarIdx:state.avatarIdx, stats:{外見力:0,デート力:0,魅了力:0,コミュ力:0}, done:[]};
+  state = normalizeState({avatarIdx: state.avatarIdx});
   save(); renderAll();
+}
+
+// ─── 冒険の書（ファイル保存・読込） ───────────────────
+// 見た目はMarkdownの「冒険の書」、中身はJSONのセーブデータをそのまま埋め込む。
+// ステータスやチェックリストの項目が増減しても、STATS/RADAR_STATS/MANUAL_COURSES/QUESTSを
+// 動的に参照しているので出力側は自動的に追従する。読込側はJSONブロックのみを見るので壊れない。
+function buildBookMarkdown(){
+  const av = AVATARS[state.avatarIdx];
+  const xp = totalXP();
+  const lv = calcLv(xp);
+  const lines = [];
+  lines.push(`# 🗺️ 冒険の書 — ${av.name}`);
+  lines.push('');
+  lines.push(`> 保存日時: ${new Date().toLocaleString('ja-JP')}`);
+  lines.push('');
+  lines.push(`## 総合レベル`);
+  lines.push(`Lv.${lv}（${LV_RANKS[lv-1]||LV_RANKS[LV_RANKS.length-1]}） — ${xp} XP`);
+  lines.push('');
+  lines.push(`## ステータス`);
+  RADAR_STATS.forEach(st => {
+    lines.push(`- ${st.icon} ${st.key}: Lv.${statLv(statValue(st.key))}（${statValue(st.key)}）${st.derived?'（自動計算）':''}`);
+  });
+  lines.push('');
+  lines.push(`## 追加ステータス`);
+  EXTRA_STATS.forEach(st => {
+    lines.push(`- ${st.icon} ${st.key}: Lv.${statLv(state.stats[st.key]||0)}（${state.stats[st.key]||0}）`);
+  });
+  lines.push('');
+  lines.push(`## マニュアル受講チェックリスト`);
+  MANUAL_COURSES.forEach(m => {
+    lines.push(`- [${state.manualDone.includes(m.key)?'x':' '}] ${m.name}`);
+  });
+  lines.push('');
+  lines.push(`## クエスト（${state.done.length} / ${QUESTS.length} 達成）`);
+  QUESTS.forEach((q,i) => {
+    lines.push(`- [${state.done.includes(i)?'x':' '}] ${q.name}`);
+  });
+  lines.push('');
+  lines.push(`## その他の記録`);
+  lines.push(`- インパス診断ツール使用回数: ${state.impassCount||0}回`);
+  lines.push(`- デートマインドマップ作成回数: ${state.mindmapCount||0}回`);
+  lines.push('');
+  lines.push(`---`);
+  lines.push(`## 💾 セーブデータ（この下のブロックは編集・削除しないでください。読込時に使用します）`);
+  lines.push('```json');
+  lines.push(JSON.stringify(state, null, 2));
+  lines.push('```');
+  lines.push('');
+  return lines.join('\n');
+}
+function saveBookFile(){
+  const md = buildBookMarkdown();
+  const blob = new Blob([md], {type:'text/markdown;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const av = AVATARS[state.avatarIdx];
+  const stamp = new Date().toISOString().slice(0,10);
+  a.href = url;
+  a.download = `冒険の書_${av.name}_${stamp}.md`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+function loadBookFile(file){
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    const text = String(reader.result);
+    const m = text.match(/```json\s*([\s\S]*?)```/);
+    if(!m){ alert('セーブデータ（JSONブロック）が見つかりませんでした。冒険の書ファイルを選択してください。'); return; }
+    let parsed;
+    try{ parsed = JSON.parse(m[1]); }
+    catch(e){ alert('セーブデータの読み込みに失敗しました。ファイルが壊れている可能性があります。'); return; }
+    state = normalizeState(parsed);
+    save(); renderAll();
+    alert('冒険の書を読み込みました📖');
+  };
+  reader.onerror = () => alert('ファイルの読み込みに失敗しました。');
+  reader.readAsText(file, 'utf-8');
 }
 
 // ─── INIT ────────────────────────────────────────────
