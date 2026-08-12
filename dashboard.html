@@ -106,7 +106,7 @@ main{display:grid;grid-template-columns:220px 1fr 280px;gap:12px;
 .stat-desc{font-size:10px;color:var(--muted);margin-top:2px}
 
 .radar-wrap{margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid #2a2a4a}
-.radar-svg{width:100%;height:auto;display:block;max-width:260px;margin:0 auto}
+.radar-svg{width:100%;height:auto;display:block;max-width:320px;margin:0 auto}
 .radar-legend{display:flex;flex-direction:column;gap:8px;margin-top:8px}
 .radar-legend-row{display:flex;align-items:center;gap:8px}
 .radar-legend-row .stat-name{flex:1}
@@ -305,7 +305,7 @@ function renderOverall(){
 }
 
 function radarSVG(){
-  const size = 220, cx = size/2, cy = size/2, r = 80;
+  const w = 320, h = 260, cx = w/2, cy = h/2, r = 68;
   const n = RADAR_STATS.length;
   const angle = i => (Math.PI*2/n)*i - Math.PI/2;
   const pt = (i, frac) => [cx + Math.cos(angle(i))*r*frac, cy + Math.sin(angle(i))*r*frac];
@@ -322,18 +322,18 @@ function radarSVG(){
   const dataPts = RADAR_STATS.map((st,i)=>pt(i, Math.min(100,state.stats[st.key]||0)/100).join(',')).join(' ');
   let labels = '';
   RADAR_STATS.forEach((st,i) => {
-    const [x,y] = pt(i,1.28);
+    const [x,y] = pt(i,1.45);
     const val = Math.min(100, state.stats[st.key]||0);
-    labels += `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="middle"
+    const dx = Math.cos(angle(i));
+    const anchor = dx > 0.3 ? 'start' : dx < -0.3 ? 'end' : 'middle';
+    labels += `<text x="${x}" y="${y}" text-anchor="${anchor}" dominant-baseline="middle"
       font-size="11" fill="${st.color}" font-weight="700">${st.icon} ${st.key}</text>
-      <text x="${x}" y="${y+13}" text-anchor="middle" font-size="9" fill="#8888AA">${val}</text>`;
+      <text x="${x}" y="${y+13}" text-anchor="${anchor}" font-size="9" fill="#8888AA">${val}</text>`;
   });
-  return `<svg viewBox="0 0 ${size} ${size+16}" class="radar-svg">
-    <g transform="translate(0,8)">
-      ${rings}${axes}
-      <polygon points="${dataPts}" fill="rgba(245,166,35,.28)" stroke="var(--gold)" stroke-width="2"/>
-      ${labels}
-    </g>
+  return `<svg viewBox="0 0 ${w} ${h}" class="radar-svg">
+    ${rings}${axes}
+    <polygon points="${dataPts}" fill="rgba(245,166,35,.28)" stroke="var(--gold)" stroke-width="2"/>
+    ${labels}
   </svg>`;
 }
 
