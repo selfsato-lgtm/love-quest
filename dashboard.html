@@ -653,6 +653,7 @@ function saveBookFile(){
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
+  alert('冒険の書を保存しました📖\n' + a.download);
 }
 function loadBookFile(file){
   if(!file) return;
