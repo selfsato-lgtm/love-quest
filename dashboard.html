@@ -110,7 +110,9 @@ main{display:grid;grid-template-columns:220px 1fr 280px;gap:12px;
 .radar-legend{display:flex;flex-direction:column;gap:8px;margin-top:8px}
 .radar-legend-row{display:flex;align-items:center;gap:8px}
 .radar-legend-row .stat-name{flex:1}
-.radar-legend-row .stat-adj{margin-top:0}
+.radar-legend-row .stat-adj{margin-top:0;display:flex;align-items:center;gap:6px}
+.derived-note{font-size:10px;color:var(--muted);font-style:italic}
+.impass-count{font-size:10px;color:var(--muted)}
 .stats-sub-heading{font-size:11px;color:var(--muted);font-weight:700;margin-bottom:10px;letter-spacing:.5px}
 
 /* ─── QUESTS ─── */
@@ -227,37 +229,48 @@ function iconImg(t, cls){
     + `onerror="this.outerHTML='<span class=&quot;${c} icon-fallback&quot;>${t.icon}</span>'">`;
 }
 
+// レーダーチャート(6軸・上から時計回り)。メンタル/魅了力/分析力は他ステータスから自動計算される派生値
 const RADAR_STATS = [
-  {key:'外見力', icon:'✨', color:'#E94560', desc:'ファッション・清潔感・雰囲気'},
-  {key:'デート力',icon:'🗺️',color:'#F5A623', desc:'デート企画・場の演出力'},
-  {key:'魅了力', icon:'💫', color:'#7B5EA7', desc:'会話・印象・トキメキを生む力'},
-  {key:'コミュ力',icon:'💬',color:'#4CAF73', desc:'タイプ読み・共感・アプローチ'},
+  {key:'メンタル',icon:'🛡️',color:'#4A9EDB', desc:'認識力が上がると連動して上がる（自動計算）', derived:true},
+  {key:'外見力', icon:'✨', color:'#E94560', desc:'ファッション講座・身だしなみ・清潔感（洋服を新調するとUP）'},
+  {key:'デート力',icon:'🗺️',color:'#F5A623', desc:'デートの回数・報告分析・デートマインドマップ作成でUP'},
+  {key:'コミュ力',icon:'💬',color:'#4CAF73', desc:'マニュアルのインプット・アウトプットでUP'},
+  {key:'魅了力', icon:'💫', color:'#7B5EA7', desc:'認識力・表現力・楽転力・共感力の経験値で上がる（自動計算）', derived:true},
+  {key:'分析力', icon:'🧠', color:'#8888AA', desc:'インパス診断ツールの使用回数で上がる（自動計算）', derived:true},
 ];
 // レーダーチャート対象外の追加ステータス
 const EXTRA_STATS = [
-  {key:'表現力', icon:'🎤', color:'#E94560', desc:'気持ちや考えを言葉・態度で伝える力'},
-  {key:'楽転力', icon:'🔄', color:'#F5A623', desc:'落ち込みや失敗を前向きに切り替える力'},
-  {key:'共感力', icon:'🤝', color:'#4CAF73', desc:'相手の気持ちに寄り添い理解する力'},
-  {key:'行動力', icon:'🏃', color:'#4A9EDB', desc:'迷わず一歩を踏み出す力'},
-  {key:'包容力', icon:'🌿', color:'#7B5EA7', desc:'相手をありのまま受け止める力'},
-  {key:'認識力', icon:'👁️', color:'#E94560', desc:'自分や相手の状態を客観的に把握する力'},
-  {key:'継続力', icon:'🔥', color:'#F5A623', desc:'コツコツ続け、習慣化する力'},
-  {key:'分析力', icon:'🧠', color:'#4CAF73', desc:'状況やタイプを見極め、要因を分解する力'},
-  {key:'メンタル',icon:'🛡️',color:'#4A9EDB', desc:'落ち込みや失恋から立て直す精神力'},
+  {key:'認識力', icon:'👁️', color:'#E94560', desc:'LCIQ診断など。上がるとメンタル力が連動して上がる'},
+  {key:'表現力', icon:'🎤', color:'#F5A623', desc:'気持ちや考えを言葉・態度で伝える力。魅了力の経験値になる'},
+  {key:'楽転力', icon:'🔄', color:'#4CAF73', desc:'落ち込みや失敗を前向きに切り替える力。魅了力の経験値になる'},
+  {key:'共感力', icon:'🤝', color:'#4A9EDB', desc:'相手の気持ちに寄り添い理解する力。魅了力の経験値になる'},
+  {key:'行動力', icon:'🏃', color:'#E94560', desc:'迷わず一歩を踏み出す力'},
+  {key:'包容力', icon:'🌿', color:'#F5A623', desc:'相手をありのまま受け止める力'},
+  {key:'継続力', icon:'🔥', color:'#4CAF73', desc:'コツコツ続け、習慣化する力'},
 ];
-const STATS = [...RADAR_STATS, ...EXTRA_STATS];
+const STATS = [...RADAR_STATS.filter(s=>!s.derived), ...EXTRA_STATS];
+
+function statValue(key){
+  if(key==='メンタル') return Math.min(100, state.stats['認識力']||0);
+  if(key==='魅了力'){
+    const src=['認識力','表現力','楽転力','共感力'];
+    return Math.min(100, Math.round(src.reduce((s,k)=>s+(state.stats[k]||0),0)/src.length));
+  }
+  if(key==='分析力') return Math.min(100, (state.impassCount||0)*10);
+  return Math.min(100, state.stats[key]||0);
+}
 
 const QUESTS = [
-  {name:'タイプ診断マスター',   desc:'恋愛式学16タイプを理解する', icon:'🔮',xp:100, reward:{コミュ力:15,魅了力:10}},
+  {name:'タイプ診断マスター',   desc:'恋愛式学16タイプを理解する', icon:'🔮',xp:100, reward:{コミュ力:15,共感力:10}},
   {name:'プロフィール写真改善', desc:'外見力基礎講座を完了',        icon:'📸',xp:80,  reward:{外見力:20}},
-  {name:'外見力 Lv.3 達成',    desc:'外見スコア30以上を達成',       icon:'✨',xp:120, reward:{外見力:10,魅了力:5}},
+  {name:'外見力 Lv.3 達成',    desc:'外見スコア30以上を達成',       icon:'✨',xp:120, reward:{外見力:10,表現力:5}},
   {name:'マッチングアプリ登録', desc:'アプリを始める第一歩',         icon:'📱',xp:50,  reward:{コミュ力:10}},
   {name:'初メッセージ送信',    desc:'相手にメッセージを送る',        icon:'💬',xp:80,  reward:{コミュ力:15,デート力:5}},
-  {name:'初回デート成功',      desc:'初めてのデートを完了',          icon:'☕',xp:200, reward:{デート力:25,魅了力:15}},
-  {name:'2回目デートOK',       desc:'相手から2回目の承諾を得る',     icon:'🌟',xp:250, reward:{魅了力:20,デート力:15}},
-  {name:'コミュ力 Lv.5 達成',  desc:'コミュスコア50以上を達成',      icon:'💫',xp:150, reward:{コミュ力:10,魅了力:10}},
-  {name:'デート力 Lv.5 達成',  desc:'デートスコア50以上を達成',      icon:'🗺️',xp:150, reward:{デート力:10,魅了力:10}},
-  {name:'交際スタート',        desc:'パートナーと付き合い始める',     icon:'💑',xp:500, reward:{外見力:10,デート力:10,魅了力:10,コミュ力:10}},
+  {name:'初回デート成功',      desc:'初めてのデートを完了',          icon:'☕',xp:200, reward:{デート力:25,共感力:15}},
+  {name:'2回目デートOK',       desc:'相手から2回目の承諾を得る',     icon:'🌟',xp:250, reward:{楽転力:20,デート力:15}},
+  {name:'コミュ力 Lv.5 達成',  desc:'コミュスコア50以上を達成',      icon:'💫',xp:150, reward:{コミュ力:10,共感力:10}},
+  {name:'デート力 Lv.5 達成',  desc:'デートスコア50以上を達成',      icon:'🗺️',xp:150, reward:{デート力:10,表現力:10}},
+  {name:'交際スタート',        desc:'パートナーと付き合い始める',     icon:'💑',xp:500, reward:{外見力:10,デート力:10,共感力:10,コミュ力:10}},
 ];
 
 const LV_THRESHOLDS = [0,100,250,450,700,1000,1400,1900,2500,3200];
@@ -268,6 +281,7 @@ const LV_RANKS = ['見習い冒険者','新米冒険者','駆け出し冒険者'
 let state = {
   avatarIdx: 2,
   stats: Object.fromEntries(STATS.map(s => [s.key, 0])),
+  impassCount: 0,
   done: [],
 };
 function save(){ localStorage.setItem('lqm', JSON.stringify(state)); }
@@ -319,11 +333,11 @@ function radarSVG(){
     const [x,y] = pt(i,1);
     axes += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#2a2a4a" stroke-width="1"/>`;
   });
-  const dataPts = RADAR_STATS.map((st,i)=>pt(i, Math.min(100,state.stats[st.key]||0)/100).join(',')).join(' ');
+  const dataPts = RADAR_STATS.map((st,i)=>pt(i, statValue(st.key)/100).join(',')).join(' ');
   let labels = '';
   RADAR_STATS.forEach((st,i) => {
     const [x,y] = pt(i,1.45);
-    const val = Math.min(100, state.stats[st.key]||0);
+    const val = statValue(st.key);
     const dx = Math.cos(angle(i));
     const anchor = dx > 0.3 ? 'start' : dx < -0.3 ? 'end' : 'middle';
     labels += `<text x="${x}" y="${y}" text-anchor="${anchor}" dominant-baseline="middle"
@@ -344,14 +358,25 @@ function renderStats(){
   const radarWrap = document.createElement('div');
   radarWrap.className = 'radar-wrap';
   radarWrap.innerHTML = radarSVG() + `<div class="radar-legend">${RADAR_STATS.map(st => {
-    const val = Math.min(100, state.stats[st.key]||0);
+    const val = statValue(st.key);
+    let ctrl;
+    if(st.key==='分析力'){
+      ctrl = `<div class="stat-adj">
+        <span class="impass-count">${state.impassCount||0}回使用</span>
+        <button class="adj-btn" onclick="useImpass()">🔮 +1回</button>
+      </div>`;
+    } else if(st.derived){
+      ctrl = `<div class="stat-adj"><span class="derived-note">自動計算</span></div>`;
+    } else {
+      ctrl = `<div class="stat-adj">
+        <button class="adj-btn" onclick="adjStat('${st.key}',-10)">−10</button>
+        <button class="adj-btn" onclick="adjStat('${st.key}',+10)">+10</button>
+      </div>`;
+    }
     return `<div class="radar-legend-row">
       <span class="stat-name">${st.icon} ${st.key}</span>
       <span class="stat-lv" style="color:${st.color}">Lv.${statLv(val)}</span>
-      <div class="stat-adj">
-        <button class="adj-btn" onclick="adjStat('${st.key}',-10)">−10</button>
-        <button class="adj-btn" onclick="adjStat('${st.key}',+10)">+10</button>
-      </div>
+      ${ctrl}
     </div>`;
   }).join('')}</div>`;
   c.appendChild(radarWrap);
@@ -435,6 +460,10 @@ function adjStat(key, delta){
   state.stats[key] = Math.max(0, Math.min(100, (state.stats[key]||0) + delta));
   save(); renderStats(); renderOverall();
 }
+function useImpass(){
+  state.impassCount = (state.impassCount||0) + 1;
+  save(); renderStats(); renderOverall();
+}
 
 function showLevelUp(lv){
   const t = document.getElementById('toast');
@@ -470,7 +499,8 @@ function selectAvatar(i){
 function loadDemo(){
   const prevLv = calcLv(totalXP());
   state.done = [0,1,3,4];
-  state.stats = {外見力:30, デート力:30, 魅了力:30, コミュ力:40};
+  state.stats = {外見力:30, デート力:30, コミュ力:40, 認識力:35, 表現力:25, 楽転力:20, 共感力:30};
+  state.impassCount = 3;
   save(); renderAll();
   const newLv = calcLv(totalXP());
   if(newLv > prevLv) showLevelUp(newLv);
