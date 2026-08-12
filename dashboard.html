@@ -243,7 +243,7 @@ const RADAR_STATS = [
   {key:'外見力', icon:'✨', color:'#E94560', desc:'ファッション講座・身だしなみ・清潔感（洋服を新調するとUP）'},
   {key:'デート力',icon:'🗺️',color:'#F5A623', desc:'デートの回数・報告分析・デートマインドマップ作成でUP'},
   {key:'コミュ力',icon:'💬',color:'#4CAF73', desc:'マニュアルのインプット・アウトプットでUP'},
-  {key:'魅了力', icon:'💫', color:'#7B5EA7', desc:'認識力・表現力・楽転力・共感力の経験値で上がる（自動計算）', derived:true},
+  {key:'魅了力', icon:'💫', color:'#7B5EA7', desc:'認識力・表現力・楽転力・共感力の経験値＋マニュアル受講チェックで上がる（自動計算）', derived:true},
   {key:'分析力', icon:'🧠', color:'#8888AA', desc:'インパス診断ツールの使用回数・デート毎のマインドマップ作成で上がる（自動計算）', derived:true},
 ];
 // マニュアル受講チェックリスト。チェックすると対象ステータスに+10（外すと-10）
@@ -272,7 +272,10 @@ function statValue(key){
   if(key==='メンタル') return Math.min(100, state.stats['認識力']||0);
   if(key==='魅了力'){
     const src=['認識力','表現力','楽転力','共感力'];
-    return Math.min(100, Math.round(src.reduce((s,k)=>s+(state.stats[k]||0),0)/src.length));
+    const avg = src.reduce((s,k)=>s+(state.stats[k]||0),0)/src.length;
+    // マニュアル受講チェックリストで認識力・表現力・楽転力・共感力を受講済みなら追加ボーナス
+    const checkedBonus = (state.manualDone||[]).filter(k=>src.includes(k)).length * 15;
+    return Math.min(100, Math.round(avg + checkedBonus));
   }
   if(key==='分析力') return Math.min(100, (state.impassCount||0)*5 + (state.mindmapCount||0)*5);
   return Math.min(100, state.stats[key]||0);
