@@ -113,7 +113,15 @@ main{display:grid;grid-template-columns:220px 1fr 280px;gap:12px;
 .radar-legend-row .stat-adj{margin-top:0;display:flex;align-items:center;gap:6px}
 .derived-note{font-size:10px;color:var(--muted);font-style:italic}
 .impass-count{font-size:10px;color:var(--muted)}
-.stats-sub-heading{font-size:11px;color:var(--muted);font-weight:700;margin-bottom:10px;letter-spacing:.5px}
+.stats-sub-heading{font-size:11px;color:var(--muted);font-weight:700;margin:16px 0 10px;letter-spacing:.5px}
+.manual-list{display:flex;flex-direction:column;gap:6px}
+.manual-row{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--light);
+  padding:6px 8px;border-radius:8px;border:1px solid #2a2a4a;background:var(--card2);cursor:pointer}
+.manual-row.done{border-color:var(--green);color:var(--green)}
+.manual-row input{flex-shrink:0}
+.manual-name{flex:1}
+.manual-target{font-size:10px;color:var(--muted)}
+.manual-row.done .manual-target{color:var(--green)}
 
 /* ─── QUESTS ─── */
 #quest-panel h3{font-size:13px;font-weight:700;color:var(--white);margin-bottom:10px}
@@ -236,7 +244,17 @@ const RADAR_STATS = [
   {key:'デート力',icon:'🗺️',color:'#F5A623', desc:'デートの回数・報告分析・デートマインドマップ作成でUP'},
   {key:'コミュ力',icon:'💬',color:'#4CAF73', desc:'マニュアルのインプット・アウトプットでUP'},
   {key:'魅了力', icon:'💫', color:'#7B5EA7', desc:'認識力・表現力・楽転力・共感力の経験値で上がる（自動計算）', derived:true},
-  {key:'分析力', icon:'🧠', color:'#8888AA', desc:'インパス診断ツールの使用回数で上がる（自動計算）', derived:true},
+  {key:'分析力', icon:'🧠', color:'#8888AA', desc:'インパス診断ツールの使用回数・デート毎のマインドマップ作成で上がる（自動計算）', derived:true},
+];
+// マニュアル受講チェックリスト。チェックすると対象ステータスに+10（外すと-10）
+const MANUAL_COURSES = [
+  {key:'認識力', name:'LCIQ認識力向上マニュアル'},
+  {key:'表現力', name:'表現力アップ講座'},
+  {key:'楽転力', name:'楽転力（ポジティブ変換）講座'},
+  {key:'共感力', name:'共感力向上講座'},
+  {key:'行動力', name:'行動力アップ講座'},
+  {key:'包容力', name:'包容力向上講座'},
+  {key:'継続力', name:'継続力アップ講座'},
 ];
 // レーダーチャート対象外の追加ステータス
 const EXTRA_STATS = [
@@ -256,7 +274,7 @@ function statValue(key){
     const src=['認識力','表現力','楽転力','共感力'];
     return Math.min(100, Math.round(src.reduce((s,k)=>s+(state.stats[k]||0),0)/src.length));
   }
-  if(key==='分析力') return Math.min(100, (state.impassCount||0)*10);
+  if(key==='分析力') return Math.min(100, (state.impassCount||0)*5 + (state.mindmapCount||0)*5);
   return Math.min(100, state.stats[key]||0);
 }
 
@@ -282,6 +300,8 @@ let state = {
   avatarIdx: 2,
   stats: Object.fromEntries(STATS.map(s => [s.key, 0])),
   impassCount: 0,
+  mindmapCount: 0,
+  manualDone: [],
   done: [],
 };
 function save(){ localStorage.setItem('lqm', JSON.stringify(state)); }
@@ -362,8 +382,10 @@ function renderStats(){
     let ctrl;
     if(st.key==='分析力'){
       ctrl = `<div class="stat-adj">
-        <span class="impass-count">${state.impassCount||0}回使用</span>
+        <span class="impass-count">インパス${state.impassCount||0}回</span>
         <button class="adj-btn" onclick="useImpass()">🔮 +1回</button>
+        <span class="impass-count">MM${state.mindmapCount||0}回</span>
+        <button class="adj-btn" onclick="useMindmap()">🗺️ +1回</button>
       </div>`;
     } else if(st.derived){
       ctrl = `<div class="stat-adj"><span class="derived-note">自動計算</span></div>`;
@@ -406,6 +428,24 @@ function renderStats(){
       </div>`;
     c.appendChild(div);
   });
+
+  const manualHeading = document.createElement('div');
+  manualHeading.className = 'stats-sub-heading';
+  manualHeading.textContent = '📚 マニュアル受講チェックリスト（受講で+10）';
+  c.appendChild(manualHeading);
+
+  const manualList = document.createElement('div');
+  manualList.className = 'manual-list';
+  MANUAL_COURSES.forEach(m => {
+    const checked = state.manualDone.includes(m.key);
+    const row = document.createElement('label');
+    row.className = 'manual-row' + (checked ? ' done' : '');
+    row.innerHTML = `<input type="checkbox" ${checked?'checked':''} onchange="toggleManual('${m.key}')">
+      <span class="manual-name">${m.name}</span>
+      <span class="manual-target">→ ${m.key}</span>`;
+    manualList.appendChild(row);
+  });
+  c.appendChild(manualList);
 }
 
 function renderQuests(){
@@ -462,6 +502,21 @@ function adjStat(key, delta){
 }
 function useImpass(){
   state.impassCount = (state.impassCount||0) + 1;
+  save(); renderStats(); renderOverall();
+}
+function useMindmap(){
+  state.mindmapCount = (state.mindmapCount||0) + 1;
+  save(); renderStats(); renderOverall();
+}
+function toggleManual(key){
+  const idx = state.manualDone.indexOf(key);
+  if(idx >= 0){
+    state.manualDone.splice(idx,1);
+    state.stats[key] = Math.max(0, (state.stats[key]||0) - 10);
+  } else {
+    state.manualDone.push(key);
+    state.stats[key] = Math.min(100, (state.stats[key]||0) + 10);
+  }
   save(); renderStats(); renderOverall();
 }
 
