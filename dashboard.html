@@ -640,23 +640,41 @@ function buildBookMarkdown(){
   lines.push('');
   return lines.join('\n');
 }
-function saveBookFile(){
+async function saveBookFile(){
   const md = buildBookMarkdown();
-  // text/markdownだとSafari等でプレビュー表示のみになりダウンロードされないことがあるため、
-  // 強制的に「ダウンロード」扱いにするMIMEタイプを使う
+  const av = AVATARS[state.avatarIdx];
+  const stamp = new Date().toISOString().slice(0,10);
+  const filename = `冒険の書_${av.name}_${stamp}.md`;
+
+  // 対応ブラウザでは保存先をその場で選べるダイアログを使う
+  if(window.showSaveFilePicker){
+    try{
+      const handle = await window.showSaveFilePicker({
+        suggestedName: filename,
+        types: [{description:'Markdown', accept:{'text/markdown':['.md']}}]
+      });
+      const writable = await handle.createWritable();
+      await writable.write(md);
+      await writable.close();
+      alert('冒険の書を保存しました📖');
+      return;
+    }catch(e){
+      if(e && e.name === 'AbortError') return; // ユーザーがキャンセル
+      // 非対応・失敗時は下のダウンロードにフォールバック
+    }
+  }
+
+  // フォールバック: ブラウザ標準のダウンロード（既定はダウンロードフォルダ）
   const blob = new Blob([md], {type:'application/octet-stream'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  const av = AVATARS[state.avatarIdx];
-  const stamp = new Date().toISOString().slice(0,10);
   a.href = url;
-  a.download = `冒険の書_${av.name}_${stamp}.md`;
+  a.download = filename;
   document.body.appendChild(a);
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
-  alert('冒険の書を保存しました📖\n' + a.download
-    + '\n\n【iPhoneの場合】「ダウンロード」をタップした後、標準では「ファイル」アプリの\n「このiPhone内」または「iCloud Drive」→「ダウンロード」フォルダに保存されます。\n保存先はSafariの「設定」→「Safari」→「ダウンロード」で変更できます。');
+  alert('冒険の書を保存しました📖\n' + filename);
 }
 function loadBookFile(file){
   if(!file) return;
