@@ -24,9 +24,6 @@ body{font-family:'Yu Gothic UI','Hiragino Sans','Meiryo',sans-serif;
   background:#0a0a1a}
 
 .hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
-.hero-still{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;
-  opacity:0;transition:opacity 1.6s ease}
-.hero-still.show{opacity:1}
 
 @media(max-width:600px){
   /* 画面のほぼ全高まで動画エリアを拡張し、下に黒い余白が残らないようにする */
@@ -100,10 +97,9 @@ footer{text-align:center;font-size:10.5px;color:#555570;padding:12px 20px}
 <div class="hero">
   <button class="sound-toggle" id="soundToggle">🔇 BGM: OFF</button>
   <button class="reload-btn" id="reloadBtn">🔄 RELOAD</button>
-  <video class="hero-video" id="heroVideo" autoplay muted playsinline>
+  <video class="hero-video" autoplay muted loop playsinline>
     <source src="assets/dragon.mp4" type="video/mp4">
   </video>
-  <img class="hero-still" id="heroStill" src="assets/party_and_castle.jpg" alt="">
   <div class="hero-scrim"></div>
   <div class="hero-content">
     <div class="hero-title">LOVEQUEST MASTERS</div>
@@ -178,14 +174,9 @@ footer{text-align:center;font-size:10.5px;color:#555570;padding:12px 20px}
   </div>
 </div>
 
-<footer>LOVEQUEST MASTERS — 恋愛式学(ジョニー式) × RPGコミュニティ<br><span style="opacity:.5">v2.0</span></footer>
+<footer>LOVEQUEST MASTERS — 恋愛式学(ジョニー式) × RPGコミュニティ</footer>
 
 <script>
-// ドラゴン動画を1回再生後、静止画（城とパーティー）にフェードイン
-document.getElementById('heroVideo').addEventListener('ended', () => {
-  document.getElementById('heroStill').classList.add('show');
-});
-
 // スクロールヒント: クリックで「冒険の書」セクションを画面先頭にスクロール
 document.getElementById('scrollHint').addEventListener('click', () => {
   document.getElementById('questSection').scrollIntoView({behavior:'smooth', block:'start'});
