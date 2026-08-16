@@ -50,9 +50,6 @@ header{background:linear-gradient(135deg,#0D0D1A 0%,#1A0D2E 100%);
 .logo{flex-shrink:0;font-size:18px;font-weight:900;letter-spacing:2px;color:var(--gold);white-space:nowrap}
 .logo span{color:var(--white)}
 .hdr-right{display:flex;gap:8px;align-items:center}
-.demo-btn{font-size:11px;padding:5px 10px;border-radius:8px;
-  border:1px solid var(--purple);background:transparent;color:var(--purple);cursor:pointer}
-.demo-btn:hover{background:var(--purple);color:var(--white)}
 .reset-btn{font-size:11px;padding:5px 10px;border-radius:8px;
   border:1px solid #444;background:transparent;color:var(--muted);cursor:pointer}
 .reset-btn:hover{background:#333;color:var(--white)}
@@ -175,7 +172,6 @@ main{display:grid;grid-template-columns:220px 1fr 280px;gap:12px;
       <button class="save-btn" onclick="saveBookFile()">📖 冒険の書を保存</button>
       <button class="load-btn" onclick="document.getElementById('bookFileInput').click()">📂 読込</button>
       <input type="file" id="bookFileInput" accept=".md,text/markdown" style="display:none" onchange="loadBookFile(this.files[0])">
-      <button class="demo-btn" onclick="loadDemo()">⚡ デモデータ</button>
       <button class="reset-btn" onclick="resetAll()">🔄 リセット</button>
       <button class="reset-btn" id="reloadBtn">🔄 RELOAD</button>
     </div>
@@ -576,16 +572,7 @@ function selectAvatar(i){
   renderAvatar();
 }
 
-// ─── DEMO / RESET ────────────────────────────────────
-function loadDemo(){
-  const prevLv = calcLv(totalXP());
-  state.done = [0,1,3,4];
-  state.stats = {外見力:30, デート力:30, コミュ力:40, 認識力:35, 表現力:25, 楽転力:20, 共感力:30};
-  state.impassCount = 3;
-  save(); renderAll();
-  const newLv = calcLv(totalXP());
-  if(newLv > prevLv) showLevelUp(newLv);
-}
+// ─── RESET ──────────────────────────────────────────
 function resetAll(){
   if(!confirm('すべてのステータス・クエスト達成状況・チェックリストをリセットします。よろしいですか？\n（アバターの選択は保持されます）')) return;
   state = normalizeState({avatarIdx: state.avatarIdx});
@@ -641,31 +628,36 @@ function buildBookMarkdown(){
   lines.push('');
   return lines.join('\n');
 }
+let savedFileHandle = null; // File System Access API対応ブラウザ(PC)で、2回目以降は同じファイルに無言で上書きするための保存先ハンドル
+
 async function saveBookFile(){
   const md = buildBookMarkdown();
   const av = AVATARS[state.avatarIdx];
   const stamp = new Date().toISOString().slice(0,10);
   const filename = `冒険の書_${av.name}_${stamp}.md`;
 
-  // 対応ブラウザでは保存先をその場で選べるダイアログを使う
+  // 対応ブラウザ(PC): 既に保存先が決まっていればダイアログなしで上書き、初回だけ保存先を選ばせる
   if(window.showSaveFilePicker){
     try{
-      const handle = await window.showSaveFilePicker({
-        suggestedName: filename,
-        types: [{description:'Markdown', accept:{'text/markdown':['.md']}}]
-      });
-      const writable = await handle.createWritable();
+      if(!savedFileHandle){
+        savedFileHandle = await window.showSaveFilePicker({
+          suggestedName: filename,
+          types: [{description:'Markdown', accept:{'text/markdown':['.md']}}]
+        });
+      }
+      const writable = await savedFileHandle.createWritable();
       await writable.write(md);
       await writable.close();
-      alert('冒険の書を保存しました📖');
+      alert('冒険の書を上書き保存しました📖\n' + savedFileHandle.name);
       return;
     }catch(e){
       if(e && e.name === 'AbortError') return; // ユーザーがキャンセル
+      savedFileHandle = null; // 失敗時は保存先情報を破棄し、次回また選び直させる
       // 非対応・失敗時は下のダウンロードにフォールバック
     }
   }
 
-  // フォールバック: ブラウザ標準のダウンロード（既定はダウンロードフォルダ）
+  // フォールバック(モバイル等・非対応ブラウザ): 毎回新規ダウンロード
   const blob = new Blob([md], {type:'application/octet-stream'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
