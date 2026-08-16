@@ -108,7 +108,8 @@ main{display:grid;grid-template-columns:220px 1fr 280px;gap:12px;
 .adj-btn:hover{background:#333;color:var(--white)}
 .stat-desc{font-size:10px;color:var(--muted);margin-top:2px}
 
-.radar-wrap{margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid #2a2a4a}
+.radar-wrap{margin-bottom:0;padding-bottom:0;border-bottom:none}
+.analysis-row{margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid #2a2a4a}
 .radar-svg{width:100%;height:auto;display:block;max-width:320px;margin:0 auto}
 .radar-legend{display:flex;flex-direction:column;gap:8px;margin-top:8px}
 .radar-legend-row{display:flex;align-items:center;gap:8px}
@@ -250,8 +251,10 @@ const RADAR_STATS = [
   {key:'デート力',icon:'🗺️',color:'#F5A623', desc:'デートの回数・報告分析・デートマインドマップ作成でUP'},
   {key:'コミュ力',icon:'💬',color:'#4CAF73', desc:'マニュアルのインプット・アウトプットでUP'},
   {key:'魅了力', icon:'💫', color:'#7B5EA7', desc:'認識力・表現力・楽転力・共感力の経験値＋マニュアル受講チェックで上がる（自動計算）', derived:true},
-  {key:'分析力', icon:'🧠', color:'#8888AA', desc:'インパス診断ツールの使用回数・デート毎のマインドマップ作成で上がる（自動計算）', derived:true},
+  {key:'経験値', icon:'🌟', color:'#8888AA', desc:'デート実施などOUTPUT（実際の行動）で上がる（自動計算）', derived:true},
 ];
+// レーダーチャートの外に置く追加の派生ステータス（分析力）
+const ANALYSIS_STAT = {key:'分析力', icon:'🧠', color:'#4A9EDB', desc:'インパス診断ツールの使用回数で上がる（自動計算）', derived:true};
 // マニュアル受講チェックリスト。チェックすると対象ステータスに+10（外すと-10）
 const MANUAL_COURSES = [
   {key:'認識力', name:'LCIQ認識力向上マニュアル'},
@@ -283,7 +286,8 @@ function statValue(key){
     const checkedBonus = (state.manualDone||[]).filter(k=>src.includes(k)).length * 15;
     return Math.min(100, Math.round(avg + checkedBonus));
   }
-  if(key==='分析力') return Math.min(100, (state.impassCount||0)*5 + (state.mindmapCount||0)*5);
+  if(key==='経験値') return Math.min(100, Math.round(totalXP()/3200*100) + (state.mindmapCount||0)*5);
+  if(key==='分析力') return Math.min(100, (state.impassCount||0)*10);
   return Math.min(100, state.stats[key]||0);
 }
 
@@ -402,10 +406,8 @@ function renderStats(){
   radarWrap.innerHTML = radarSVG() + `<div class="radar-legend">${RADAR_STATS.map(st => {
     const val = statValue(st.key);
     let ctrl;
-    if(st.key==='分析力'){
+    if(st.key==='経験値'){
       ctrl = `<div class="stat-adj">
-        <span class="impass-count">インパス${state.impassCount||0}回</span>
-        <button class="adj-btn" onclick="useImpass()">🔮 +1回</button>
         <span class="impass-count">MM${state.mindmapCount||0}回</span>
         <button class="adj-btn" onclick="useMindmap()">🗺️ +1回</button>
       </div>`;
@@ -424,6 +426,20 @@ function renderStats(){
     </div>`;
   }).join('')}</div>`;
   c.appendChild(radarWrap);
+
+  const analysisRow = document.createElement('div');
+  analysisRow.className = 'radar-legend-row analysis-row';
+  {
+    const val = statValue(ANALYSIS_STAT.key);
+    analysisRow.innerHTML = `
+      <span class="stat-name">${ANALYSIS_STAT.icon} ${ANALYSIS_STAT.key}</span>
+      <span class="stat-lv" style="color:${ANALYSIS_STAT.color}">Lv.${statLv(val)}</span>
+      <div class="stat-adj">
+        <span class="impass-count">インパス${state.impassCount||0}回</span>
+        <button class="adj-btn" onclick="useImpass()">🔮 +1回</button>
+      </div>`;
+  }
+  c.appendChild(analysisRow);
 
   const extraHeading = document.createElement('div');
   extraHeading.className = 'stats-sub-heading';
@@ -600,6 +616,7 @@ function buildBookMarkdown(){
   RADAR_STATS.forEach(st => {
     lines.push(`- ${st.icon} ${st.key}: Lv.${statLv(statValue(st.key))}（${statValue(st.key)}）${st.derived?'（自動計算）':''}`);
   });
+  lines.push(`- ${ANALYSIS_STAT.icon} ${ANALYSIS_STAT.key}: Lv.${statLv(statValue(ANALYSIS_STAT.key))}（${statValue(ANALYSIS_STAT.key)}）（自動計算）`);
   lines.push('');
   lines.push(`## 追加ステータス`);
   EXTRA_STATS.forEach(st => {
