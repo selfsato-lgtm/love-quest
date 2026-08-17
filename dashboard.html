@@ -63,6 +63,7 @@ header{background:linear-gradient(135deg,#0D0D1A 0%,#1A0D2E 100%);
 /* ─── LAYOUT ─── */
 main{display:grid;grid-template-columns:220px 1fr 280px;gap:12px;
   padding:12px;max-width:1100px;margin:0 auto}
+.left-col{display:flex;flex-direction:column;gap:12px}
 @media(max-width:860px){main{grid-template-columns:1fr 1fr}
   #quest-panel{grid-column:1/-1}}
 @media(max-width:540px){main{grid-template-columns:1fr}
@@ -195,36 +196,38 @@ main{display:grid;grid-template-columns:220px 1fr 280px;gap:12px;
 
 <!-- Main -->
 <main>
-  <!-- Avatar Panel -->
-  <div class="panel" id="avatar-panel">
-    <div class="av-display" id="av-icon">🧙</div>
-    <div class="av-title" id="av-name">魔法戦士</div>
-    <div class="av-sub" id="av-sub">戦士 × 魔法使い</div>
-    <button class="change-btn" onclick="openModal()">✏️ 変更</button>
-    <div class="overall-box">
-      <div class="overall-lbl">総合レベル</div>
-      <div class="overall-lv" id="ov-lv">Lv.1</div>
-      <div class="overall-title" id="ov-rank">見習い冒険者</div>
-      <div class="xp-bar-bg"><div class="xp-bar-fill" id="xp-bar" style="width:0%"></div></div>
-      <div class="xp-txt" id="xp-txt">0 / 100 XP</div>
+  <!-- Left Column: Avatar + Command -->
+  <div class="left-col">
+    <div class="panel" id="avatar-panel">
+      <div class="av-display" id="av-icon">🧙</div>
+      <div class="av-title" id="av-name">魔法戦士</div>
+      <div class="av-sub" id="av-sub">戦士 × 魔法使い</div>
+      <button class="change-btn" onclick="openModal()">✏️ 変更</button>
+      <div class="overall-box">
+        <div class="overall-lbl">総合レベル</div>
+        <div class="overall-lv" id="ov-lv">Lv.1</div>
+        <div class="overall-title" id="ov-rank">見習い冒険者</div>
+        <div class="xp-bar-bg"><div class="xp-bar-fill" id="xp-bar" style="width:0%"></div></div>
+        <div class="xp-txt" id="xp-txt">0 / 100 XP</div>
+      </div>
     </div>
-  </div>
 
-  <!-- Command Panel -->
-  <div class="panel" id="command-panel">
-    <h3>⚔️ コマンド</h3>
-    <a class="cmd-item" href="https://gitmind.com/jp/" target="_blank" rel="noopener">
-      <span class="cmd-arrow">▶</span>
-      <span class="cmd-text">マインドマップ<span class="cmd-sub">（事前準備）</span></span>
-    </a>
-    <div class="cmd-item cmd-item-disabled">
-      <span class="cmd-arrow">▶</span>
-      <span class="cmd-text">デートログ<span class="cmd-sub">（事後振り返り）</span></span>
+    <!-- Command Panel -->
+    <div class="panel" id="command-panel">
+      <h3>⚔️ コマンド</h3>
+      <a class="cmd-item" href="https://gitmind.com/jp/" target="_blank" rel="noopener">
+        <span class="cmd-arrow">▶</span>
+        <span class="cmd-text">マインドマップ<span class="cmd-sub">（事前準備）</span></span>
+      </a>
+      <div class="cmd-item cmd-item-disabled">
+        <span class="cmd-arrow">▶</span>
+        <span class="cmd-text">デートログ<span class="cmd-sub">（事後振り返り）</span></span>
+      </div>
+      <a class="cmd-item" href="https://fants.jp/accounts/sign_in" target="_blank" rel="noopener">
+        <span class="cmd-arrow">▶</span>
+        <span class="cmd-text">FANTSの扉<span class="cmd-sub">（BrightForMen）</span></span>
+      </a>
     </div>
-    <a class="cmd-item" href="https://fants.jp/accounts/sign_in" target="_blank" rel="noopener">
-      <span class="cmd-arrow">▶</span>
-      <span class="cmd-text">FANTSの扉<span class="cmd-sub">（BrightForMen）</span></span>
-    </a>
   </div>
 
   <!-- Stats Panel -->
