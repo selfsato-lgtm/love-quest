@@ -171,8 +171,19 @@ main{display:grid;grid-template-columns:180px 1fr 280px;gap:12px;
 .datelog-toggle.closed{transform:rotate(-90deg)}
 .datelog-body{padding:0 14px 14px;border-top:1px solid #2a2a4a}
 .datelog-body.closed{display:none}
+.dl-mybirth{display:flex;align-items:center;gap:10px;margin-top:14px;padding:10px 12px;
+  background:var(--card2);border:1px solid var(--gold);border-radius:10px}
+.dl-mybirth label{font-size:11.5px;color:var(--gold);font-weight:700;white-space:nowrap}
+.dl-mybirth input{background:var(--card);border:1px solid #2a2a4a;border-radius:8px;
+  padding:6px 9px;font-size:12px;color:var(--light);font-family:inherit}
 .datelog-form{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
   gap:10px;margin-top:14px}
+.dl-stepper{display:flex;align-items:center;gap:8px}
+.dl-step-btn{flex-shrink:0;width:28px;height:28px;border-radius:6px;border:1px solid #2a2a4a;
+  background:var(--card2);color:var(--gold);font-size:14px;font-weight:900;cursor:pointer;line-height:1}
+.dl-step-btn:hover{border-color:var(--gold)}
+#dl-cost-display{font-size:13px;font-weight:700;color:var(--light);min-width:64px;text-align:center}
+.dl-age-diff{font-size:10.5px;color:var(--gold);min-height:14px}
 .dl-field{display:flex;flex-direction:column;gap:4px}
 .dl-field-wide{grid-column:1/-1}
 .dl-field label{font-size:10.5px;color:var(--muted)}
@@ -195,6 +206,7 @@ main{display:grid;grid-template-columns:180px 1fr 280px;gap:12px;
 .dl-table td[contenteditable="true"]{cursor:text;min-width:60px;max-width:220px;
   white-space:normal;overflow-wrap:break-word}
 .dl-table td[contenteditable="true"]:focus{outline:1px solid var(--gold);background:var(--card2)}
+.dl-table td.dl-readonly{color:var(--muted);cursor:default}
 .dl-del-btn{background:transparent;border:1px solid var(--red);color:var(--red);
   border-radius:6px;padding:3px 8px;font-size:10.5px;cursor:pointer}
 .dl-del-btn:hover{background:var(--red);color:var(--white)}
@@ -293,9 +305,16 @@ main{display:grid;grid-template-columns:180px 1fr 280px;gap:12px;
     </div>
     <div class="datelog-body" id="datelog-body">
 
+      <div class="dl-mybirth">
+        <label>🎂 MyBirth（自分の生年月日）</label>
+        <input type="date" id="dl-mybirth" onchange="onMyBirthChange()">
+      </div>
+
       <form class="datelog-form" id="datelog-form" onsubmit="return false;">
         <div class="dl-field"><label>デート日時</label>
           <input type="datetime-local" id="dl-datetime"></div>
+        <div class="dl-field"><label>お相手のお名前</label>
+          <input type="text" id="dl-name" placeholder="例: ○○さん"></div>
         <div class="dl-field"><label>出会ったツール</label>
           <input type="text" id="dl-tool" placeholder="例: マッチングアプリ○○"></div>
         <div class="dl-field"><label>服装</label>
@@ -303,11 +322,17 @@ main{display:grid;grid-template-columns:180px 1fr 280px;gap:12px;
         <div class="dl-field"><label>お店の情報</label>
           <input type="text" id="dl-shop" placeholder="例: オンラインのためなし／店名"></div>
         <div class="dl-field"><label>デートで使用した合計金額</label>
-          <input type="number" id="dl-cost" placeholder="円"></div>
+          <div class="dl-stepper">
+            <button type="button" class="dl-step-btn" onclick="adjDlCost(-1000)">－</button>
+            <span id="dl-cost-display">0円</span>
+            <button type="button" class="dl-step-btn" onclick="adjDlCost(1000)">＋</button>
+          </div>
+          <input type="hidden" id="dl-cost" value="0"></div>
         <div class="dl-field"><label>今回の女性とのデート回数</label>
           <input type="number" id="dl-visitCount" min="1" placeholder="回目"></div>
         <div class="dl-field"><label>お相手の年齢</label>
-          <input type="text" id="dl-age" placeholder="例: 28歳（+2歳）"></div>
+          <input type="number" id="dl-age" placeholder="歳" oninput="updateAgeDiffPreview()">
+          <span class="dl-age-diff" id="dl-age-diff"></span></div>
         <div class="dl-field"><label>お相手の職業</label>
           <input type="text" id="dl-job"></div>
         <div class="dl-field"><label>お相手の住まい</label>
@@ -330,7 +355,7 @@ main{display:grid;grid-template-columns:180px 1fr 280px;gap:12px;
       <div class="dl-table-wrap">
         <table class="dl-table" id="dl-table">
           <thead><tr>
-            <th>日時</th><th>ツール</th><th>服装</th><th>お店</th><th>金額</th><th>回数</th>
+            <th>日時</th><th>名前</th><th>ツール</th><th>服装</th><th>お店</th><th>金額</th><th>回数</th>
             <th>年齢</th><th>職業</th><th>住まい</th><th>タイプ</th>
             <th>目標</th><th>会話</th><th>うまくいったこと</th><th>感想・改善点</th><th></th>
           </tr></thead>
@@ -450,6 +475,7 @@ let state = {
   manualDone: [],
   done: [],
   dateLogs: [],
+  myBirth: '',
 };
 function save(){ localStorage.setItem('lqm', JSON.stringify(state)); }
 // 読み込んだstateに不足フィールドを補完する（旧セーブデータ・他バージョンの冒険の書ファイルにも対応）。
@@ -462,6 +488,7 @@ function normalizeState(s){
   if(!Array.isArray(s.manualDone)) s.manualDone = [];
   if(!Array.isArray(s.done)) s.done = [];
   if(!Array.isArray(s.dateLogs)) s.dateLogs = [];
+  if(typeof s.myBirth !== 'string') s.myBirth = '';
   if(typeof s.avatarIdx !== 'number') s.avatarIdx = 2;
   return s;
 }
@@ -728,6 +755,8 @@ function resetAll(){
   if(!confirm('すべてのステータス・クエスト達成状況・チェックリストをリセットします。よろしいですか？\n（アバターの選択は保持されます）')) return;
   state = normalizeState({avatarIdx: state.avatarIdx});
   save(); renderAll();
+  document.getElementById('dl-mybirth').value = '';
+  renderDateLogs();
   alert('リセットしました🔄');
 }
 
@@ -773,10 +802,12 @@ function buildBookMarkdown(){
   lines.push(`- デートマインドマップ作成回数: ${state.mindmapCount||0}回`);
   lines.push('');
   lines.push(`## 📔 デートログ（${state.dateLogs.length}件）`);
+  lines.push(`MyBirth: ${state.myBirth || '(未設定)'}`);
+  lines.push('');
   [...state.dateLogs].reverse().forEach((e,i) => {
-    lines.push(`### ${i+1}. ${e.datetime || '(日時未記入)'} ${e.tool ? '｜' + e.tool : ''}`);
+    lines.push(`### ${i+1}. ${e.datetime || '(日時未記入)'} ${e.name ? '｜' + e.name : ''} ${e.tool ? '｜' + e.tool : ''}`);
     lines.push(`- 服装: ${e.outfit || '-'} ／ お店: ${e.shop || '-'} ／ 金額: ${e.cost || '-'}円 ／ 今回の女性とのデート回数: ${e.visitCount || '-'}回目`);
-    lines.push(`- お相手: 年齢${e.age||'-'} ／ 職業${e.job||'-'} ／ 住まい${e.home||'-'} ／ タイプ${e.type||'-'}`);
+    lines.push(`- お相手: 年齢${e.age||'-'}${e.age?ageDiffLabel(e.age):''} ／ 職業${e.job||'-'} ／ 住まい${e.home||'-'} ／ タイプ${typeLabelWithSub(e.type)||'-'}`);
     if(e.goal) lines.push(`- 今回の目標: ${e.goal}`);
     if(e.talk) lines.push(`- 会話の内容: ${e.talk}`);
     if(e.good) lines.push(`- うまくいったこと: ${e.good}`);
@@ -845,6 +876,8 @@ function loadBookFile(file){
     catch(e){ alert('セーブデータの読み込みに失敗しました。ファイルが壊れている可能性があります。'); return; }
     state = normalizeState(parsed);
     save(); renderAll();
+    document.getElementById('dl-mybirth').value = state.myBirth || '';
+    renderDateLogs();
     alert('冒険の書を読み込みました📖');
   };
   reader.onerror = () => alert('ファイルの読み込みに失敗しました。');
@@ -859,11 +892,49 @@ function toggleDateLogAccordion(){
 function dlEscapeHtml(s){
   return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
+
+// ─── MyBirth（自分の生年月日） ───
+function calcAgeFromBirth(birthStr){
+  if(!birthStr) return null;
+  const birth = new Date(birthStr);
+  if(isNaN(birth)) return null;
+  const today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+  const m = today.getMonth() - birth.getMonth();
+  if(m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+  return age;
+}
+function onMyBirthChange(){
+  state.myBirth = document.getElementById('dl-mybirth').value;
+  save();
+  updateAgeDiffPreview();
+}
+function ageDiffLabel(partnerAge){
+  const myAge = calcAgeFromBirth(state.myBirth);
+  const n = parseInt(partnerAge, 10);
+  if(myAge === null || !n) return '';
+  const diff = n - myAge;
+  return diff === 0 ? '（同い年）' : diff > 0 ? `（+${diff}歳）` : `（${diff}歳）`;
+}
+function updateAgeDiffPreview(){
+  const val = document.getElementById('dl-age').value;
+  document.getElementById('dl-age-diff').textContent = ageDiffLabel(val);
+}
+
+// ─── 金額ステッパー（千円単位） ───
+function adjDlCost(delta){
+  const input = document.getElementById('dl-cost');
+  const next = Math.max(0, (parseInt(input.value, 10) || 0) + delta);
+  input.value = next;
+  document.getElementById('dl-cost-display').textContent = next.toLocaleString('ja-JP') + '円';
+}
+
 function addDateLog(){
   const get = id => document.getElementById(id).value.trim();
   const entry = {
     id: Date.now(),
     datetime: get('dl-datetime'),
+    name: get('dl-name'),
     tool: get('dl-tool'),
     outfit: get('dl-outfit'),
     shop: get('dl-shop'),
@@ -885,6 +956,9 @@ function addDateLog(){
   state.dateLogs.push(entry);
   save();
   document.getElementById('datelog-form').reset();
+  document.getElementById('dl-cost').value = '0';
+  document.getElementById('dl-cost-display').textContent = '0円';
+  document.getElementById('dl-age-diff').textContent = '';
   renderDateLogs();
 }
 function deleteDateLog(id){
@@ -913,23 +987,36 @@ function renderDateLogSummary(){
     + `／ 1回目: ${buckets[1]}　2回目: ${buckets[2]}　3回目: ${buckets[3]}　`
     + `4回目: ${buckets[4]}　5回目: ${buckets[5]}　6回目以上: ${buckets['6+']}`;
 }
+function typeLabelWithSub(name){
+  if(!name) return '';
+  const av = AVATARS.find(a => a.name === name);
+  return av ? `${name}（${av.sub}）` : name;
+}
+// テーブル列の並び（datetimeと削除ボタンを除く、表示用の加工が必要な列は displayFn を持つ）
+const DL_COLUMNS = [
+  {field:'datetime'}, {field:'name'}, {field:'tool'}, {field:'outfit'}, {field:'shop'},
+  {field:'cost'}, {field:'visitCount'},
+  {field:'age', displayFn: e => e.age ? dlEscapeHtml(e.age) + dlEscapeHtml(ageDiffLabel(e.age)) : ''},
+  {field:'job'}, {field:'home'},
+  {field:'type', displayFn: e => dlEscapeHtml(typeLabelWithSub(e.type))},
+  {field:'goal'}, {field:'talk'}, {field:'good'}, {field:'review'},
+];
 function renderDateLogs(){
   renderDateLogSummary();
   const tbody = document.getElementById('dl-tbody');
   if(state.dateLogs.length === 0){
-    tbody.innerHTML = `<tr><td colspan="15" class="dl-empty">まだデートログがありません。上のフォームから追加してください。</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="${DL_COLUMNS.length+1}" class="dl-empty">まだデートログがありません。上のフォームから追加してください。</td></tr>`;
     return;
   }
-  const editableCols = ['tool','outfit','shop','cost','visitCount','age','job','home','goal','talk','good','review'];
   tbody.innerHTML = [...state.dateLogs].reverse().map(e => {
-    const cells = editableCols.map(f =>
-      `<td contenteditable="true" onblur="updateDateLogField(${e.id},'${f}',this.textContent)">${dlEscapeHtml(e[f])}</td>`
-    ).join('');
-    return `<tr>
-      <td contenteditable="true" onblur="updateDateLogField(${e.id},'datetime',this.textContent)">${dlEscapeHtml(e.datetime)}</td>
-      ${cells}
-      <td><button class="dl-del-btn" onclick="deleteDateLog(${e.id})">削除</button></td>
-    </tr>`;
+    const cells = DL_COLUMNS.map(col => {
+      if(col.displayFn){
+        // 注釈（年齢差・タイプ副属性）が付くセルは表示専用。編集はフォームから行う
+        return `<td class="dl-readonly" title="編集はフォームから行ってください">${col.displayFn(e)}</td>`;
+      }
+      return `<td contenteditable="true" onblur="updateDateLogField(${e.id},'${col.field}',this.textContent)">${dlEscapeHtml(e[col.field])}</td>`;
+    }).join('');
+    return `<tr>${cells}<td><button class="dl-del-btn" onclick="deleteDateLog(${e.id})">削除</button></td></tr>`;
   }).join('');
 }
 function populateDateLogTypeSelect(){
@@ -937,7 +1024,7 @@ function populateDateLogTypeSelect(){
   AVATARS.forEach(av => {
     const opt = document.createElement('option');
     opt.value = av.name;
-    opt.textContent = av.name;
+    opt.textContent = `${av.name}（${av.sub}）`;
     sel.appendChild(opt);
   });
 }
@@ -957,6 +1044,7 @@ if(localStorage.getItem('lqm')){
 }
 renderAll();
 populateDateLogTypeSelect();
+document.getElementById('dl-mybirth').value = state.myBirth || '';
 renderDateLogs();
 </script>
 </body>
