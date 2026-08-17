@@ -50,14 +50,14 @@ header{background:linear-gradient(135deg,#0D0D1A 0%,#1A0D2E 100%);
 .logo{flex-shrink:0;font-size:18px;font-weight:900;letter-spacing:2px;color:var(--gold);white-space:nowrap}
 .logo span{color:var(--white)}
 .hdr-right{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-end}
-.reset-btn{flex-shrink:0;white-space:nowrap;font-size:11px;padding:5px 10px;border-radius:8px;
-  border:1px solid #444;background:transparent;color:var(--muted);cursor:pointer}
+.reset-btn,.save-btn,.load-btn{flex-shrink:0;white-space:nowrap;font-size:11px;
+  padding:5px 10px;border-radius:8px;background:transparent;cursor:pointer;
+  min-width:84px;text-align:center}
+.reset-btn{border:1px solid #444;color:var(--muted)}
 .reset-btn:hover{background:#333;color:var(--white)}
-.save-btn{flex-shrink:0;white-space:nowrap;font-size:11px;padding:5px 10px;border-radius:8px;
-  border:1px solid var(--gold);background:transparent;color:var(--gold);cursor:pointer}
+.save-btn{border:1px solid var(--gold);color:var(--gold)}
 .save-btn:hover{background:var(--gold);color:var(--bg)}
-.load-btn{flex-shrink:0;white-space:nowrap;font-size:11px;padding:5px 10px;border-radius:8px;
-  border:1px solid var(--blue);background:transparent;color:var(--blue);cursor:pointer}
+.load-btn{border:1px solid var(--blue);color:var(--blue)}
 .load-btn:hover{background:var(--blue);color:var(--white)}
 
 /* ─── LAYOUT ─── */
