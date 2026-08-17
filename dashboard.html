@@ -94,6 +94,20 @@ main{display:grid;grid-template-columns:220px 1fr 280px;gap:12px;
 .xp-bar-fill{height:100%;border-radius:4px;background:var(--purple);transition:width .5s ease}
 .xp-txt{font-size:10px;color:var(--muted);margin-top:3px;text-align:right}
 
+/* ─── COMMAND PANEL（RPGのコマンドウィンドウ風） ─── */
+#command-panel h3{font-size:13px;font-weight:700;color:var(--white);margin-bottom:10px}
+.cmd-item{display:flex;align-items:center;gap:8px;padding:10px 12px;margin-bottom:6px;
+  border:1.5px solid #3a3a5a;border-radius:8px;background:var(--card2);
+  text-decoration:none;color:var(--light);cursor:pointer;transition:.12s}
+.cmd-item:hover{border-color:var(--gold);background:#1e1e40}
+.cmd-item:hover .cmd-arrow{color:var(--gold);transform:translateX(2px)}
+.cmd-arrow{color:var(--muted);font-size:11px;flex-shrink:0;transition:.12s}
+.cmd-text{font-size:12.5px;font-weight:700;color:var(--white)}
+.cmd-sub{display:block;font-size:10px;font-weight:400;color:var(--muted);margin-top:2px}
+.cmd-item-disabled{cursor:default;opacity:.55}
+.cmd-item-disabled:hover{border-color:#3a3a5a;background:var(--card2)}
+.cmd-item-disabled:hover .cmd-arrow{color:var(--muted);transform:none}
+
 /* ─── STATS ─── */
 #stats-panel h3{font-size:13px;font-weight:700;color:var(--white);margin-bottom:12px}
 .stat-row{margin-bottom:14px}
@@ -194,6 +208,23 @@ main{display:grid;grid-template-columns:220px 1fr 280px;gap:12px;
       <div class="xp-bar-bg"><div class="xp-bar-fill" id="xp-bar" style="width:0%"></div></div>
       <div class="xp-txt" id="xp-txt">0 / 100 XP</div>
     </div>
+  </div>
+
+  <!-- Command Panel -->
+  <div class="panel" id="command-panel">
+    <h3>⚔️ コマンド</h3>
+    <a class="cmd-item" href="https://gitmind.com/jp/" target="_blank" rel="noopener">
+      <span class="cmd-arrow">▶</span>
+      <span class="cmd-text">マインドマップ<span class="cmd-sub">（事前準備）</span></span>
+    </a>
+    <div class="cmd-item cmd-item-disabled">
+      <span class="cmd-arrow">▶</span>
+      <span class="cmd-text">デートログ<span class="cmd-sub">（事後振り返り）</span></span>
+    </div>
+    <a class="cmd-item" href="https://fants.jp/accounts/sign_in" target="_blank" rel="noopener">
+      <span class="cmd-arrow">▶</span>
+      <span class="cmd-text">FANTSの扉<span class="cmd-sub">（BrightForMen）</span></span>
+    </a>
   </div>
 
   <!-- Stats Panel -->
