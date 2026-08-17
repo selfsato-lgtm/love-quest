@@ -161,45 +161,6 @@ main{display:grid;grid-template-columns:180px 1fr 280px;gap:12px;
 .q-item.done .q-check::before{content:'✅'}
 .q-item:not(.done) .q-check::before{content:'⬜'}
 
-/* ─── DATE LOG ─── */
-.datelog-wrap{max-width:1100px;margin:0 auto;padding:0 12px 24px}
-.datelog-panel{padding:0;overflow:hidden}
-.datelog-header{display:flex;align-items:center;justify-content:space-between;
-  padding:14px;cursor:pointer;user-select:none}
-.datelog-header h3{font-size:13px;font-weight:700;color:var(--white)}
-.datelog-toggle{color:var(--muted);font-size:12px;transition:transform .2s}
-.datelog-toggle.closed{transform:rotate(-90deg)}
-.datelog-body{padding:0 14px 14px;border-top:1px solid #2a2a4a}
-.datelog-body.closed{display:none}
-.datelog-form{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
-  gap:10px;margin-top:14px}
-.dl-field{display:flex;flex-direction:column;gap:4px}
-.dl-field-wide{grid-column:1/-1}
-.dl-field label{font-size:10.5px;color:var(--muted)}
-.dl-field input,.dl-field select,.dl-field textarea{background:var(--card2);
-  border:1px solid #2a2a4a;border-radius:8px;padding:7px 9px;font-size:12px;
-  color:var(--light);font-family:inherit}
-.dl-field textarea{min-height:52px;resize:vertical}
-.dl-field input:focus,.dl-field select:focus,.dl-field textarea:focus{outline:none;border-color:var(--gold)}
-.dl-add-btn{grid-column:1/-1;font-size:12.5px;padding:9px;border-radius:10px;
-  border:none;background:var(--gold);color:var(--bg);font-weight:900;cursor:pointer;margin-top:4px}
-.dl-add-btn:hover{filter:brightness(1.08)}
-.dl-summary{margin-top:16px;padding:10px 12px;background:var(--card2);border:1px solid #2a2a4a;
-  border-radius:10px;font-size:11.5px;color:var(--light);line-height:1.8}
-.dl-summary b{color:var(--gold)}
-.dl-table-wrap{margin-top:14px;overflow-x:auto}
-.dl-table{border-collapse:collapse;width:100%;font-size:11px}
-.dl-table th,.dl-table td{border:1px solid #2a2a4a;padding:6px 8px;text-align:left;
-  white-space:nowrap;color:var(--light)}
-.dl-table th{background:var(--card2);color:var(--muted);position:sticky;top:0}
-.dl-table td[contenteditable="true"]{cursor:text;min-width:60px;max-width:220px;
-  white-space:normal;overflow-wrap:break-word}
-.dl-table td[contenteditable="true"]:focus{outline:1px solid var(--gold);background:var(--card2)}
-.dl-del-btn{background:transparent;border:1px solid var(--red);color:var(--red);
-  border-radius:6px;padding:3px 8px;font-size:10.5px;cursor:pointer}
-.dl-del-btn:hover{background:var(--red);color:var(--white)}
-.dl-empty{padding:16px;text-align:center;color:var(--muted);font-size:11.5px}
-
 /* ─── TOAST ─── */
 #toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.8);
   background:linear-gradient(135deg,#1A0D35,#2A1A55);
@@ -260,7 +221,7 @@ main{display:grid;grid-template-columns:180px 1fr 280px;gap:12px;
         <span class="cmd-arrow">▶</span>
         <span class="cmd-text">マインドマップ<span class="cmd-sub">（事前準備）</span></span>
       </a>
-      <div class="cmd-item" onclick="document.getElementById('datelog-panel').scrollIntoView({behavior:'smooth', block:'start'})">
+      <div class="cmd-item cmd-item-disabled">
         <span class="cmd-arrow">▶</span>
         <span class="cmd-text">デートログ<span class="cmd-sub">（事後振り返り）</span></span>
       </div>
@@ -283,64 +244,6 @@ main{display:grid;grid-template-columns:180px 1fr 280px;gap:12px;
     <div id="quest-container"></div>
   </div>
 </main>
-
-<!-- Date Log Section -->
-<div class="datelog-wrap">
-  <div class="panel datelog-panel" id="datelog-panel">
-    <div class="datelog-header" onclick="toggleDateLogAccordion()">
-      <h3>📔 デートログ（事後振り返り）</h3>
-      <span class="datelog-toggle" id="datelog-toggle-icon">▼</span>
-    </div>
-    <div class="datelog-body" id="datelog-body">
-
-      <form class="datelog-form" id="datelog-form" onsubmit="return false;">
-        <div class="dl-field"><label>デート日時</label>
-          <input type="datetime-local" id="dl-datetime"></div>
-        <div class="dl-field"><label>出会ったツール</label>
-          <input type="text" id="dl-tool" placeholder="例: マッチングアプリ○○"></div>
-        <div class="dl-field"><label>服装</label>
-          <input type="text" id="dl-outfit" placeholder="例: きれいめカジュアル"></div>
-        <div class="dl-field"><label>お店の情報</label>
-          <input type="text" id="dl-shop" placeholder="例: オンラインのためなし／店名"></div>
-        <div class="dl-field"><label>デートで使用した合計金額</label>
-          <input type="number" id="dl-cost" placeholder="円"></div>
-        <div class="dl-field"><label>今回の女性とのデート回数</label>
-          <input type="number" id="dl-visitCount" min="1" placeholder="回目"></div>
-        <div class="dl-field"><label>お相手の年齢</label>
-          <input type="text" id="dl-age" placeholder="例: 28歳（+2歳）"></div>
-        <div class="dl-field"><label>お相手の職業</label>
-          <input type="text" id="dl-job"></div>
-        <div class="dl-field"><label>お相手の住まい</label>
-          <input type="text" id="dl-home"></div>
-        <div class="dl-field"><label>相手のタイプ</label>
-          <select id="dl-type"><option value="">未診断</option></select></div>
-        <div class="dl-field dl-field-wide"><label>今回の目標</label>
-          <textarea id="dl-goal"></textarea></div>
-        <div class="dl-field dl-field-wide"><label>会話の内容</label>
-          <textarea id="dl-talk"></textarea></div>
-        <div class="dl-field dl-field-wide"><label>今回のデートで少しでもうまくいったこと</label>
-          <textarea id="dl-good"></textarea></div>
-        <div class="dl-field dl-field-wide"><label>感想・次回に向けての改善点</label>
-          <textarea id="dl-review"></textarea></div>
-        <button class="dl-add-btn" onclick="addDateLog()">＋ デートログを追加</button>
-      </form>
-
-      <div class="dl-summary" id="dl-summary"></div>
-
-      <div class="dl-table-wrap">
-        <table class="dl-table" id="dl-table">
-          <thead><tr>
-            <th>日時</th><th>ツール</th><th>服装</th><th>お店</th><th>金額</th><th>回数</th>
-            <th>年齢</th><th>職業</th><th>住まい</th><th>タイプ</th>
-            <th>目標</th><th>会話</th><th>うまくいったこと</th><th>感想・改善点</th><th></th>
-          </tr></thead>
-          <tbody id="dl-tbody"></tbody>
-        </table>
-      </div>
-
-    </div>
-  </div>
-</div>
 
 <!-- Level Up Toast -->
 <div id="toast">
@@ -449,7 +352,6 @@ let state = {
   mindmapCount: 0,
   manualDone: [],
   done: [],
-  dateLogs: [],
 };
 function save(){ localStorage.setItem('lqm', JSON.stringify(state)); }
 // 読み込んだstateに不足フィールドを補完する（旧セーブデータ・他バージョンの冒険の書ファイルにも対応）。
@@ -461,7 +363,6 @@ function normalizeState(s){
   if(typeof s.mindmapCount !== 'number') s.mindmapCount = 0;
   if(!Array.isArray(s.manualDone)) s.manualDone = [];
   if(!Array.isArray(s.done)) s.done = [];
-  if(!Array.isArray(s.dateLogs)) s.dateLogs = [];
   if(typeof s.avatarIdx !== 'number') s.avatarIdx = 2;
   return s;
 }
@@ -772,17 +673,6 @@ function buildBookMarkdown(){
   lines.push(`- インパス診断ツール使用回数: ${state.impassCount||0}回`);
   lines.push(`- デートマインドマップ作成回数: ${state.mindmapCount||0}回`);
   lines.push('');
-  lines.push(`## 📔 デートログ（${state.dateLogs.length}件）`);
-  [...state.dateLogs].reverse().forEach((e,i) => {
-    lines.push(`### ${i+1}. ${e.datetime || '(日時未記入)'} ${e.tool ? '｜' + e.tool : ''}`);
-    lines.push(`- 服装: ${e.outfit || '-'} ／ お店: ${e.shop || '-'} ／ 金額: ${e.cost || '-'}円 ／ 今回の女性とのデート回数: ${e.visitCount || '-'}回目`);
-    lines.push(`- お相手: 年齢${e.age||'-'} ／ 職業${e.job||'-'} ／ 住まい${e.home||'-'} ／ タイプ${e.type||'-'}`);
-    if(e.goal) lines.push(`- 今回の目標: ${e.goal}`);
-    if(e.talk) lines.push(`- 会話の内容: ${e.talk}`);
-    if(e.good) lines.push(`- うまくいったこと: ${e.good}`);
-    if(e.review) lines.push(`- 感想・改善点: ${e.review}`);
-    lines.push('');
-  });
   lines.push(`---`);
   lines.push(`## 💾 セーブデータ（この下のブロックは編集・削除しないでください。読込時に使用します）`);
   lines.push('```json');
@@ -851,97 +741,6 @@ function loadBookFile(file){
   reader.readAsText(file, 'utf-8');
 }
 
-// ─── 📔 デートログ ───────────────────────────────────
-function toggleDateLogAccordion(){
-  document.getElementById('datelog-body').classList.toggle('closed');
-  document.getElementById('datelog-toggle-icon').classList.toggle('closed');
-}
-function dlEscapeHtml(s){
-  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-function addDateLog(){
-  const get = id => document.getElementById(id).value.trim();
-  const entry = {
-    id: Date.now(),
-    datetime: get('dl-datetime'),
-    tool: get('dl-tool'),
-    outfit: get('dl-outfit'),
-    shop: get('dl-shop'),
-    cost: get('dl-cost'),
-    visitCount: get('dl-visitCount'),
-    age: get('dl-age'),
-    job: get('dl-job'),
-    home: get('dl-home'),
-    type: get('dl-type'),
-    goal: get('dl-goal'),
-    talk: get('dl-talk'),
-    good: get('dl-good'),
-    review: get('dl-review'),
-  };
-  if(!entry.datetime && !entry.tool && !entry.talk){
-    alert('最低限「デート日時」か「出会ったツール」か「会話の内容」のいずれかを入力してください');
-    return;
-  }
-  state.dateLogs.push(entry);
-  save();
-  document.getElementById('datelog-form').reset();
-  renderDateLogs();
-}
-function deleteDateLog(id){
-  if(!confirm('このデートログを削除しますか？')) return;
-  state.dateLogs = state.dateLogs.filter(e => e.id !== id);
-  save();
-  renderDateLogs();
-}
-function updateDateLogField(id, field, value){
-  const entry = state.dateLogs.find(e => e.id === id);
-  if(!entry) return;
-  entry[field] = value.trim();
-  save();
-}
-function renderDateLogSummary(){
-  const box = document.getElementById('dl-summary');
-  const logs = state.dateLogs;
-  if(logs.length === 0){ box.innerHTML = '<b>ブラメンに入ってからの通算デート回数:</b> 計0回'; return; }
-  const buckets = {1:0, 2:0, 3:0, 4:0, 5:0, '6+':0};
-  logs.forEach(e => {
-    const n = parseInt(e.visitCount, 10);
-    if(!n || n < 1) return;
-    if(n >= 6) buckets['6+']++; else buckets[n]++;
-  });
-  box.innerHTML = `<b>ブラメンに入ってからの通算デート回数:</b> 計${logs.length}回　`
-    + `／ 1回目: ${buckets[1]}　2回目: ${buckets[2]}　3回目: ${buckets[3]}　`
-    + `4回目: ${buckets[4]}　5回目: ${buckets[5]}　6回目以上: ${buckets['6+']}`;
-}
-function renderDateLogs(){
-  renderDateLogSummary();
-  const tbody = document.getElementById('dl-tbody');
-  if(state.dateLogs.length === 0){
-    tbody.innerHTML = `<tr><td colspan="15" class="dl-empty">まだデートログがありません。上のフォームから追加してください。</td></tr>`;
-    return;
-  }
-  const editableCols = ['tool','outfit','shop','cost','visitCount','age','job','home','goal','talk','good','review'];
-  tbody.innerHTML = [...state.dateLogs].reverse().map(e => {
-    const cells = editableCols.map(f =>
-      `<td contenteditable="true" onblur="updateDateLogField(${e.id},'${f}',this.textContent)">${dlEscapeHtml(e[f])}</td>`
-    ).join('');
-    return `<tr>
-      <td contenteditable="true" onblur="updateDateLogField(${e.id},'datetime',this.textContent)">${dlEscapeHtml(e.datetime)}</td>
-      ${cells}
-      <td><button class="dl-del-btn" onclick="deleteDateLog(${e.id})">削除</button></td>
-    </tr>`;
-  }).join('');
-}
-function populateDateLogTypeSelect(){
-  const sel = document.getElementById('dl-type');
-  AVATARS.forEach(av => {
-    const opt = document.createElement('option');
-    opt.value = av.name;
-    opt.textContent = av.name;
-    sel.appendChild(opt);
-  });
-}
-
 // リロードボタン(ホーム画面追加時のスタンドアロン表示にはブラウザのリロードUIがないため)
 document.getElementById('reloadBtn').addEventListener('click', () => {
   location.href = location.pathname + '?t=' + Date.now();
@@ -956,8 +755,6 @@ if(localStorage.getItem('lqm')){
   document.getElementById('modal').style.display = 'flex';
 }
 renderAll();
-populateDateLogTypeSelect();
-renderDateLogs();
 </script>
 </body>
 </html>
