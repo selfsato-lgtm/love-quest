@@ -49,14 +49,14 @@ header{background:linear-gradient(135deg,#0D0D1A 0%,#1A0D2E 100%);
 .hdr-side.right{justify-content:flex-end}
 .logo{flex-shrink:0;font-size:18px;font-weight:900;letter-spacing:2px;color:var(--gold);white-space:nowrap}
 .logo span{color:var(--white)}
-.hdr-right{display:flex;gap:8px;align-items:center}
-.reset-btn{font-size:11px;padding:5px 10px;border-radius:8px;
+.hdr-right{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-end}
+.reset-btn{flex-shrink:0;white-space:nowrap;font-size:11px;padding:5px 10px;border-radius:8px;
   border:1px solid #444;background:transparent;color:var(--muted);cursor:pointer}
 .reset-btn:hover{background:#333;color:var(--white)}
-.save-btn{font-size:11px;padding:5px 10px;border-radius:8px;
+.save-btn{flex-shrink:0;white-space:nowrap;font-size:11px;padding:5px 10px;border-radius:8px;
   border:1px solid var(--gold);background:transparent;color:var(--gold);cursor:pointer}
 .save-btn:hover{background:var(--gold);color:var(--bg)}
-.load-btn{font-size:11px;padding:5px 10px;border-radius:8px;
+.load-btn{flex-shrink:0;white-space:nowrap;font-size:11px;padding:5px 10px;border-radius:8px;
   border:1px solid var(--blue);background:transparent;color:var(--blue);cursor:pointer}
 .load-btn:hover{background:var(--blue);color:var(--white)}
 
@@ -69,7 +69,7 @@ main{display:grid;grid-template-columns:180px 1fr 280px;gap:12px;
   #quest-panel{grid-column:1/-1}}
 @media(max-width:540px){main{grid-template-columns:1fr}
   #quest-panel{grid-column:auto}
-  .left-col{max-width:220px;margin:0 auto}}
+  .left-col{max-width:none;margin:0}}
 @media(max-width:600px){
   .portal-back{padding:6px 10px;font-size:10px}
   .portal-back .pb-txt{display:none}
