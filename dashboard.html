@@ -316,8 +316,24 @@ main{display:grid;grid-template-columns:180px 1fr 280px;gap:12px;
           <input type="datetime-local" id="dl-datetime"></div>
         <div class="dl-field"><label>お相手のお名前</label>
           <input type="text" id="dl-name" placeholder="例: ○○さん"></div>
-        <div class="dl-field"><label>出会ったツール</label>
-          <input type="text" id="dl-tool" placeholder="例: マッチングアプリ○○"></div>
+        <div class="dl-field"><label>出会ったきっかけ</label>
+          <select id="dl-tool" onchange="onDlToolChange()">
+            <option value="">選択してください</option>
+            <option value="合コン">合コン</option>
+            <option value="パーティー">パーティー</option>
+            <option value="知人・友人繋がり">知人・友人繋がり</option>
+            <option value="職場・趣味等のコミュニティ">職場・趣味等のコミュニティ</option>
+            <option value="マッチングアプリ(pairs)">マッチングアプリ(pairs)</option>
+            <option value="マッチングアプリ(with)">マッチングアプリ(with)</option>
+            <option value="マッチングアプリ(omiai)">マッチングアプリ(omiai)</option>
+            <option value="マッチングアプリ(IBJ)">マッチングアプリ(IBJ)</option>
+            <option value="マッチングアプリ(東カレ)">マッチングアプリ(東カレ)</option>
+            <option value="マッチングアプリ(バチェラー)">マッチングアプリ(バチェラー)</option>
+            <option value="マッチングアプリ(その他)">マッチングアプリ(その他)</option>
+            <option value="その他">その他</option>
+          </select></div>
+        <div class="dl-field" id="dl-tool-other-wrap" style="display:none"><label>出会ったきっかけ（その他・詳細）</label>
+          <input type="text" id="dl-tool-other" placeholder="具体的に入力してください"></div>
         <div class="dl-field"><label>服装</label>
           <input type="text" id="dl-outfit" placeholder="例: きれいめカジュアル"></div>
         <div class="dl-field"><label>お店の情報</label>
@@ -358,7 +374,7 @@ main{display:grid;grid-template-columns:180px 1fr 280px;gap:12px;
       <div class="dl-table-wrap">
         <table class="dl-table" id="dl-table">
           <thead><tr>
-            <th>日時</th><th>名前</th><th>ツール</th><th>服装</th><th>お店</th><th>金額</th><th>回数</th>
+            <th>日時</th><th>名前</th><th>きっかけ</th><th>服装</th><th>お店</th><th>金額</th><th>回数</th>
             <th>年齢</th><th>職業</th><th>住まい</th><th>タイプ</th>
             <th>目標</th><th>会話</th><th>うまくいったこと</th><th>感想・改善点</th><th>その後のやり取り/次回約束</th><th></th>
           </tr></thead>
@@ -925,6 +941,17 @@ function updateAgeDiffPreview(){
   document.getElementById('dl-age-diff').textContent = ageDiffLabel(val);
 }
 
+// ─── 出会ったきっかけ（「その他」選択時のみ手入力欄を表示） ───
+function onDlToolChange(){
+  const wrap = document.getElementById('dl-tool-other-wrap');
+  wrap.style.display = document.getElementById('dl-tool').value === 'その他' ? '' : 'none';
+}
+function dlToolValue(){
+  const sel = document.getElementById('dl-tool').value;
+  if(sel === 'その他') return document.getElementById('dl-tool-other').value.trim();
+  return sel;
+}
+
 // ─── 金額（ステッパーボタン／手入力どちらも可、カンマ区切り表示） ───
 function dlCostRaw(str){
   return parseInt(String(str).replace(/[^0-9]/g, ''), 10) || 0;
@@ -946,7 +973,7 @@ function addDateLog(){
     id: Date.now(),
     datetime: get('dl-datetime'),
     name: get('dl-name'),
-    tool: get('dl-tool'),
+    tool: dlToolValue(),
     outfit: get('dl-outfit'),
     shop: get('dl-shop'),
     cost: String(dlCostRaw(get('dl-cost'))),
@@ -962,7 +989,7 @@ function addDateLog(){
     followup: get('dl-followup'),
   };
   if(!entry.datetime && !entry.tool && !entry.talk){
-    alert('最低限「デート日時」か「出会ったツール」か「会話の内容」のいずれかを入力してください');
+    alert('最低限「デート日時」か「出会ったきっかけ」か「会話の内容」のいずれかを入力してください');
     return;
   }
   state.dateLogs.push(entry);
@@ -970,6 +997,7 @@ function addDateLog(){
   document.getElementById('datelog-form').reset();
   document.getElementById('dl-cost').value = '0';
   document.getElementById('dl-age-diff').textContent = '';
+  document.getElementById('dl-tool-other-wrap').style.display = 'none';
   renderDateLogs();
 }
 function deleteDateLog(id){
