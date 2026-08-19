@@ -976,14 +976,14 @@ function updateDateLogField(id, field, value){
 function renderDateLogSummary(){
   const box = document.getElementById('dl-summary');
   const logs = state.dateLogs;
-  if(logs.length === 0){ box.innerHTML = '<b>ブラメンに入ってからの通算デート回数:</b> 計0回'; return; }
+  if(logs.length === 0){ box.innerHTML = '<b>通算デート回数:</b> 計0回'; return; }
   const buckets = {1:0, 2:0, 3:0, 4:0, 5:0, '6+':0};
   logs.forEach(e => {
     const n = parseInt(e.visitCount, 10);
     if(!n || n < 1) return;
     if(n >= 6) buckets['6+']++; else buckets[n]++;
   });
-  box.innerHTML = `<b>ブラメンに入ってからの通算デート回数:</b> 計${logs.length}回　`
+  box.innerHTML = `<b>通算デート回数:</b> 計${logs.length}回　`
     + `／ 1回目: ${buckets[1]}　2回目: ${buckets[2]}　3回目: ${buckets[3]}　`
     + `4回目: ${buckets[4]}　5回目: ${buckets[5]}　6回目以上: ${buckets['6+']}`;
 }
