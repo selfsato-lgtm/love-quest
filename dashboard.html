@@ -325,7 +325,7 @@ main{display:grid;grid-template-columns:180px 1fr 280px;gap:12px;
         <div class="dl-field"><label>デートで使用した合計金額</label>
           <div class="dl-stepper">
             <button type="button" class="dl-step-btn" onclick="adjDlCost(-1000)">－</button>
-            <input type="number" id="dl-cost" min="0" step="100" value="0" oninput="onDlCostInput()">
+            <input type="text" inputmode="numeric" id="dl-cost" value="0" oninput="onDlCostInput()">
             <span class="dl-cost-unit">円</span>
             <button type="button" class="dl-step-btn" onclick="adjDlCost(1000)">＋</button>
           </div>
@@ -809,7 +809,7 @@ function buildBookMarkdown(){
   lines.push('');
   [...state.dateLogs].reverse().forEach((e,i) => {
     lines.push(`### ${i+1}. ${e.datetime || '(日時未記入)'} ${e.name ? '｜' + e.name : ''} ${e.tool ? '｜' + e.tool : ''}`);
-    lines.push(`- 服装: ${e.outfit || '-'} ／ お店: ${e.shop || '-'} ／ 金額: ${e.cost || '-'}円 ／ 今回の女性とのデート回数: ${e.visitCount || '-'}回目`);
+    lines.push(`- 服装: ${e.outfit || '-'} ／ お店: ${e.shop || '-'} ／ 金額: ${e.cost ? (parseInt(e.cost,10)||0).toLocaleString('ja-JP') : '-'}円 ／ 今回の女性とのデート回数: ${e.visitCount || '-'}回目`);
     lines.push(`- お相手: 年齢${e.age||'-'}${e.age?ageDiffLabel(e.age):''} ／ 職業${e.job||'-'} ／ 住まい${e.home||'-'} ／ タイプ${typeLabelWithSub(e.type)||'-'}`);
     if(e.goal) lines.push(`- 今回の目標: ${e.goal}`);
     if(e.talk) lines.push(`- 会話の内容: ${e.talk}`);
@@ -925,15 +925,19 @@ function updateAgeDiffPreview(){
   document.getElementById('dl-age-diff').textContent = ageDiffLabel(val);
 }
 
-// ─── 金額（ステッパーボタン／手入力どちらも可） ───
+// ─── 金額（ステッパーボタン／手入力どちらも可、カンマ区切り表示） ───
+function dlCostRaw(str){
+  return parseInt(String(str).replace(/[^0-9]/g, ''), 10) || 0;
+}
 function adjDlCost(delta){
   const input = document.getElementById('dl-cost');
-  const next = Math.max(0, (parseInt(input.value, 10) || 0) + delta);
-  input.value = next;
+  const next = Math.max(0, dlCostRaw(input.value) + delta);
+  input.value = next.toLocaleString('ja-JP');
 }
 function onDlCostInput(){
   const input = document.getElementById('dl-cost');
-  if(input.value !== '' && (parseInt(input.value, 10) || 0) < 0) input.value = 0;
+  const next = Math.max(0, dlCostRaw(input.value));
+  input.value = next.toLocaleString('ja-JP');
 }
 
 function addDateLog(){
@@ -945,7 +949,7 @@ function addDateLog(){
     tool: get('dl-tool'),
     outfit: get('dl-outfit'),
     shop: get('dl-shop'),
-    cost: get('dl-cost'),
+    cost: String(dlCostRaw(get('dl-cost'))),
     visitCount: get('dl-visitCount'),
     age: get('dl-age'),
     job: get('dl-job'),
@@ -1002,7 +1006,8 @@ function typeLabelWithSub(name){
 // テーブル列の並び（datetimeと削除ボタンを除く、表示用の加工が必要な列は displayFn を持つ）
 const DL_COLUMNS = [
   {field:'datetime'}, {field:'name'}, {field:'tool'}, {field:'outfit'}, {field:'shop'},
-  {field:'cost'}, {field:'visitCount'},
+  {field:'cost', displayFn: e => e.cost ? dlEscapeHtml((parseInt(e.cost,10)||0).toLocaleString('ja-JP')) + '円' : ''},
+  {field:'visitCount'},
   {field:'age', displayFn: e => e.age ? dlEscapeHtml(e.age) + dlEscapeHtml(ageDiffLabel(e.age)) : ''},
   {field:'job'}, {field:'home'},
   {field:'type', displayFn: e => dlEscapeHtml(typeLabelWithSub(e.type))},
