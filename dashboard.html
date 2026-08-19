@@ -182,7 +182,8 @@ main{display:grid;grid-template-columns:180px 1fr 280px;gap:12px;
 .dl-step-btn{flex-shrink:0;width:28px;height:28px;border-radius:6px;border:1px solid #2a2a4a;
   background:var(--card2);color:var(--gold);font-size:14px;font-weight:900;cursor:pointer;line-height:1}
 .dl-step-btn:hover{border-color:var(--gold)}
-#dl-cost-display{font-size:13px;font-weight:700;color:var(--light);min-width:64px;text-align:center}
+#dl-cost{width:90px;text-align:center;flex-shrink:0}
+.dl-cost-unit{font-size:12px;color:var(--muted)}
 .dl-age-diff{font-size:10.5px;color:var(--gold);min-height:14px}
 .dl-field{display:flex;flex-direction:column;gap:4px}
 .dl-field-wide{grid-column:1/-1}
@@ -324,10 +325,10 @@ main{display:grid;grid-template-columns:180px 1fr 280px;gap:12px;
         <div class="dl-field"><label>デートで使用した合計金額</label>
           <div class="dl-stepper">
             <button type="button" class="dl-step-btn" onclick="adjDlCost(-1000)">－</button>
-            <span id="dl-cost-display">0円</span>
+            <input type="number" id="dl-cost" min="0" step="100" value="0" oninput="onDlCostInput()">
+            <span class="dl-cost-unit">円</span>
             <button type="button" class="dl-step-btn" onclick="adjDlCost(1000)">＋</button>
           </div>
-          <input type="hidden" id="dl-cost" value="0"></div>
         <div class="dl-field"><label>今回の女性とのデート回数</label>
           <input type="number" id="dl-visitCount" min="1" placeholder="回目"></div>
         <div class="dl-field"><label>お相手の年齢</label>
@@ -924,12 +925,15 @@ function updateAgeDiffPreview(){
   document.getElementById('dl-age-diff').textContent = ageDiffLabel(val);
 }
 
-// ─── 金額ステッパー（千円単位） ───
+// ─── 金額（ステッパーボタン／手入力どちらも可） ───
 function adjDlCost(delta){
   const input = document.getElementById('dl-cost');
   const next = Math.max(0, (parseInt(input.value, 10) || 0) + delta);
   input.value = next;
-  document.getElementById('dl-cost-display').textContent = next.toLocaleString('ja-JP') + '円';
+}
+function onDlCostInput(){
+  const input = document.getElementById('dl-cost');
+  if(input.value !== '' && (parseInt(input.value, 10) || 0) < 0) input.value = 0;
 }
 
 function addDateLog(){
@@ -961,7 +965,6 @@ function addDateLog(){
   save();
   document.getElementById('datelog-form').reset();
   document.getElementById('dl-cost').value = '0';
-  document.getElementById('dl-cost-display').textContent = '0円';
   document.getElementById('dl-age-diff').textContent = '';
   renderDateLogs();
 }
