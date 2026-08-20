@@ -427,7 +427,7 @@ const RADAR_STATS = [
   {key:'外見力', icon:'✨', color:'#E94560', desc:'ファッション講座・身だしなみ・清潔感（洋服を新調するとUP）'},
   {key:'デート力',icon:'🗺️',color:'#F5A623', desc:'デートの回数・報告分析・デートマインドマップ作成でUP'},
   {key:'コミュ力',icon:'💬',color:'#4CAF73', desc:'マニュアルのインプット・アウトプットでUP'},
-  {key:'魅了力', icon:'💫', color:'#7B5EA7', desc:'認識力・表現力・楽転力・共感力の経験値＋マニュアル受講チェックで上がる（自動計算）', derived:true},
+  {key:'魅了力', icon:'💫', color:'#7B5EA7', desc:'認識力・表現力・楽転力・共感力・行動力・包容力の経験値＋マニュアル受講チェックで上がる（自動計算）', derived:true},
   {key:'経験値', icon:'🌟', color:'#8888AA', desc:'デート実施などOUTPUT（実際の行動）で上がる（自動計算）', derived:true},
 ];
 // レーダーチャートの外に置く追加の派生ステータス（分析力）
@@ -448,8 +448,8 @@ const EXTRA_STATS = [
   {key:'表現力', icon:'🎤', color:'#F5A623', desc:'気持ちや考えを言葉・態度で伝える力。魅了力の経験値になる'},
   {key:'楽転力', icon:'🔄', color:'#4CAF73', desc:'落ち込みや失敗を前向きに切り替える力。魅了力の経験値になる'},
   {key:'共感力', icon:'🤝', color:'#4A9EDB', desc:'相手の気持ちに寄り添い理解する力。魅了力の経験値になる'},
-  {key:'行動力', icon:'🏃', color:'#E94560', desc:'迷わず一歩を踏み出す力'},
-  {key:'包容力', icon:'🌿', color:'#F5A623', desc:'相手をありのまま受け止める力'},
+  {key:'行動力', icon:'🏃', color:'#E94560', desc:'迷わず一歩を踏み出す力。魅了力の経験値になる'},
+  {key:'包容力', icon:'🌿', color:'#F5A623', desc:'相手をありのまま受け止める力。魅了力の経験値になる'},
   {key:'継続力', icon:'🔥', color:'#4CAF73', desc:'コツコツ続け、習慣化する力'},
 ];
 const STATS = [...RADAR_STATS.filter(s=>!s.derived), ...EXTRA_STATS];
@@ -457,9 +457,9 @@ const STATS = [...RADAR_STATS.filter(s=>!s.derived), ...EXTRA_STATS];
 function statValue(key){
   if(key==='メンタル') return Math.min(100, state.stats['認識力']||0);
   if(key==='魅了力'){
-    const src=['認識力','表現力','楽転力','共感力'];
+    const src=['認識力','表現力','楽転力','共感力','行動力','包容力'];
     const avg = src.reduce((s,k)=>s+(state.stats[k]||0),0)/src.length;
-    // マニュアル受講チェックリストで認識力・表現力・楽転力・共感力を受講済みなら追加ボーナス
+    // マニュアル受講チェックリストで上記6項目を受講済みなら追加ボーナス
     const checkedBonus = (state.manualDone||[]).filter(k=>src.includes(k)).length * 15;
     return Math.min(100, Math.round(avg + checkedBonus));
   }
