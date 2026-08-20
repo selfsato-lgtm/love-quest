@@ -591,7 +591,7 @@ function renderStats(){
     let ctrl;
     if(st.key==='経験値'){
       ctrl = `<div class="stat-adj xp-adj">
-        <span class="impass-count">MM${state.mindmapCount||0}回<button class="adj-btn adj-btn-mini" onclick="adjMindmap(-1)">−</button><button class="adj-btn adj-btn-mini" onclick="adjMindmap(1)">＋</button>
+        <span class="impass-count">マインドマップ${state.mindmapCount||0}回<button class="adj-btn adj-btn-mini" onclick="adjMindmap(-1)">−</button><button class="adj-btn adj-btn-mini" onclick="adjMindmap(1)">＋</button>
         ／インパス${state.impassCount||0}回<button class="adj-btn adj-btn-mini" onclick="adjImpass(-1)">−</button><button class="adj-btn adj-btn-mini" onclick="adjImpass(1)">＋</button>
         ／デート${state.dateLogs.length}件（自動計測、誤カウント時は±で補正可）</span>
       </div>`;
