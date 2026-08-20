@@ -123,6 +123,8 @@ main{display:grid;grid-template-columns:180px 1fr 280px;gap:12px;
 .adj-btn{font-size:10px;padding:2px 7px;border-radius:5px;border:1px solid #444;
   background:transparent;color:var(--muted);cursor:pointer;transition:.1s}
 .adj-btn:hover{background:#333;color:var(--white)}
+.adj-btn-mini{font-size:9px;padding:0 4px;margin:0 2px}
+.xp-adj{flex-direction:column;align-items:flex-end;gap:2px}
 .stat-desc{font-size:10px;color:var(--muted);margin-top:2px}
 
 .radar-wrap{margin-bottom:0;padding-bottom:0;border-bottom:none}
@@ -588,8 +590,10 @@ function renderStats(){
     const val = statValue(st.key);
     let ctrl;
     if(st.key==='経験値'){
-      ctrl = `<div class="stat-adj">
-        <span class="impass-count">MM${state.mindmapCount||0}回／インパス${state.impassCount||0}回／デート${state.dateLogs.length}件（すべて自動計測）</span>
+      ctrl = `<div class="stat-adj xp-adj">
+        <span class="impass-count">MM${state.mindmapCount||0}回<button class="adj-btn adj-btn-mini" onclick="adjMindmap(-1)">−</button><button class="adj-btn adj-btn-mini" onclick="adjMindmap(1)">＋</button>
+        ／インパス${state.impassCount||0}回<button class="adj-btn adj-btn-mini" onclick="adjImpass(-1)">−</button><button class="adj-btn adj-btn-mini" onclick="adjImpass(1)">＋</button>
+        ／デート${state.dateLogs.length}件（自動計測、誤カウント時は±で補正可）</span>
       </div>`;
     } else if(st.derived){
       ctrl = `<div class="stat-adj"><span class="derived-note">自動計算</span></div>`;
@@ -615,7 +619,7 @@ function renderStats(){
       <span class="stat-name">${ANALYSIS_STAT.icon} ${ANALYSIS_STAT.key}</span>
       <span class="stat-lv" style="color:${ANALYSIS_STAT.color}">Lv.${statLv(val)}</span>
       <div class="stat-adj">
-        <span class="impass-count">インパス${state.impassCount||0}回（自動計測）</span>
+        <span class="impass-count">インパス${state.impassCount||0}回<button class="adj-btn adj-btn-mini" onclick="adjImpass(-1)">−</button><button class="adj-btn adj-btn-mini" onclick="adjImpass(1)">＋</button>（自動計測、誤カウント時は±で補正可）</span>
       </div>`;
   }
   c.appendChild(analysisRow);
@@ -719,6 +723,14 @@ function adjStat(key, delta){
 }
 function useMindmap(){
   state.mindmapCount = (state.mindmapCount||0) + 1;
+  save(); renderStats(); renderOverall();
+}
+function adjMindmap(delta){
+  state.mindmapCount = Math.max(0, (state.mindmapCount||0) + delta);
+  save(); renderStats(); renderOverall();
+}
+function adjImpass(delta){
+  state.impassCount = Math.max(0, (state.impassCount||0) + delta);
   save(); renderStats(); renderOverall();
 }
 function toggleManual(key){
