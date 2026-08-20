@@ -313,6 +313,17 @@ function copyResult(){
   navigator.clipboard.writeText(txt).then(()=>alert("結果をコピーしました"));
 }
 calc();
+
+// クエストシステム(dashboard.html)と同じlocalStorage('lqm')を共有し、
+// このページを開くたびにインパス診断回数を自動加算する（経験値・分析力の自動計算に使われる）
+(function trackImpassView(){
+  try{
+    const raw = localStorage.getItem('lqm');
+    const st = raw ? JSON.parse(raw) : {};
+    st.impassCount = (st.impassCount||0) + 1;
+    localStorage.setItem('lqm', JSON.stringify(st));
+  }catch(e){ /* localStorage不可時は何もしない */ }
+})();
 </script>
 </body>
 </html>

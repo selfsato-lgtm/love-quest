@@ -269,7 +269,7 @@ main{display:grid;grid-template-columns:180px 1fr 280px;gap:12px;
     <!-- Command Panel -->
     <div class="panel" id="command-panel">
       <h3>⚔️ コマンド</h3>
-      <a class="cmd-item" href="https://gitmind.com/jp/" target="_blank" rel="noopener">
+      <a class="cmd-item" href="https://gitmind.com/jp/" target="_blank" rel="noopener" onclick="useMindmap()">
         <span class="cmd-arrow">▶</span>
         <span class="cmd-text">マインドマップ<span class="cmd-sub">（事前準備、相手の記録）</span></span>
       </a>
@@ -428,7 +428,7 @@ const RADAR_STATS = [
   {key:'デート力',icon:'🗺️',color:'#F5A623', desc:'デートの回数・報告分析・デートマインドマップ作成でUP'},
   {key:'コミュ力',icon:'💬',color:'#4CAF73', desc:'マニュアルのインプット・アウトプットでUP'},
   {key:'魅了力', icon:'💫', color:'#7B5EA7', desc:'認識力・表現力・楽転力・共感力・行動力・包容力の経験値＋マニュアル受講チェックで上がる（自動計算）', derived:true},
-  {key:'経験値', icon:'🌟', color:'#8888AA', desc:'デート実施などOUTPUT（実際の行動）で上がる（自動計算）', derived:true},
+  {key:'経験値', icon:'🌟', color:'#8888AA', desc:'クエスト達成度＋マインドマップ作成／インパス診断／デートログ件数で上がる（自動計算）', derived:true},
 ];
 // レーダーチャートの外に置く追加の派生ステータス（分析力）
 const ANALYSIS_STAT = {key:'分析力', icon:'🧠', color:'#4A9EDB', desc:'インパス診断ツールの使用回数で上がる（自動計算）', derived:true};
@@ -463,7 +463,7 @@ function statValue(key){
     const checkedBonus = (state.manualDone||[]).filter(k=>src.includes(k)).length * 15;
     return Math.min(100, Math.round(avg + checkedBonus));
   }
-  if(key==='経験値') return Math.min(100, Math.round(totalXP()/3200*100) + (state.mindmapCount||0)*5);
+  if(key==='経験値') return Math.min(100, Math.round(totalXP()/3200*100) + (state.mindmapCount||0)*5 + (state.impassCount||0)*5 + (state.dateLogs||[]).length*10);
   if(key==='分析力') return Math.min(100, (state.impassCount||0)*10);
   return Math.min(100, state.stats[key]||0);
 }
@@ -589,8 +589,7 @@ function renderStats(){
     let ctrl;
     if(st.key==='経験値'){
       ctrl = `<div class="stat-adj">
-        <span class="impass-count">MM${state.mindmapCount||0}回</span>
-        <button class="adj-btn" onclick="useMindmap()">🗺️ +1回</button>
+        <span class="impass-count">MM${state.mindmapCount||0}回／インパス${state.impassCount||0}回／デート${state.dateLogs.length}件（すべて自動計測）</span>
       </div>`;
     } else if(st.derived){
       ctrl = `<div class="stat-adj"><span class="derived-note">自動計算</span></div>`;
@@ -616,8 +615,7 @@ function renderStats(){
       <span class="stat-name">${ANALYSIS_STAT.icon} ${ANALYSIS_STAT.key}</span>
       <span class="stat-lv" style="color:${ANALYSIS_STAT.color}">Lv.${statLv(val)}</span>
       <div class="stat-adj">
-        <span class="impass-count">インパス${state.impassCount||0}回</span>
-        <button class="adj-btn" onclick="useImpass()">🔮 +1回</button>
+        <span class="impass-count">インパス${state.impassCount||0}回（自動計測）</span>
       </div>`;
   }
   c.appendChild(analysisRow);
@@ -717,10 +715,6 @@ function toggleQuest(i){
 
 function adjStat(key, delta){
   state.stats[key] = Math.max(0, Math.min(100, (state.stats[key]||0) + delta));
-  save(); renderStats(); renderOverall();
-}
-function useImpass(){
-  state.impassCount = (state.impassCount||0) + 1;
   save(); renderStats(); renderOverall();
 }
 function useMindmap(){
