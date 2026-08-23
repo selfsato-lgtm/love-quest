@@ -76,6 +76,8 @@ header p{font-size:11px;color:var(--muted);margin-top:3px}
 .mt-wordcat{margin-bottom:8px}
 .mt-wordcat-t{font-size:11px;color:var(--muted);margin-bottom:4px}
 .mt-source{font-size:10px;color:#555570;text-align:right;margin-top:6px}
+.mt-source a{color:#555570;text-decoration:underline}
+.mt-source a:hover{color:var(--gold)}
 .mt-badge{font-size:9px;margin-left:3px}
 
 /* ── CHECKER ── */
@@ -409,6 +411,22 @@ const MASTER_TRAITS = {
   },
 };
 const MASTER_SOURCE = 'FANTS パーソナル恋愛式学 継承マスター講座資料より';
+// 継承マスター資料（源流ドキュメント）へのリンク。シスター・姫・狂戦士は資料未着手のため未登録
+const SOURCE_DOC_URLS = {
+  '妖精': 'https://docs.google.com/document/d/1T2NTNx_eqcodWsTQq36lzT29p8OQo6V6M537Xz7txdo/edit?hl=ja&tab=t.0',
+  '牧師': 'https://docs.google.com/document/d/1hJBIvL84lfE9J955hsI3eiOH4e0tUprt1toqL2JbGMU/edit?tab=t.0',
+  '賢者': 'https://docs.google.com/document/d/1GhOvevp5wCXQ-PUqISENioP1VaV-kUj62PLq7rhs9wc/edit?tab=t.0',
+  '占い師': 'https://docs.google.com/document/d/1rPnt2PBYnOCfDR30AYYn3DA5bSEeaoZ_mHN9uU0zGMs/edit?tab=t.0',
+  '騎士': 'https://docs.google.com/document/d/1yJpD2tj1eo5prC8Nj2NAtYRlb2r3vvcBFCdZzzhO58U/edit?tab=t.0',
+  '勇者': 'https://docs.google.com/document/d/16sM0V8PGAWAzXiDZ_TYNmesOG6CMMBvHBUeK6NB9CD4/edit?usp=sharing',
+  '盗賊': 'https://docs.google.com/document/d/1_RGHIKus88p9VhpX8Z6T411aaQO5AOEq8ddFnfP7P2s/edit?usp=sharing',
+  '道化師': 'https://docs.google.com/document/d/10HwWXU4yII6Ki6CiZ5tRIvI72mFc0HQTUfUp0NBw1oc/edit?usp=sharing',
+  '忍者': 'https://docs.google.com/document/d/1Ecf5KJ9c5FZOg9U-o9WmTTwNgR_JHKPl9L1StFtlSbg/edit?usp=sharing',
+  '魔法戦士': 'https://docs.google.com/document/d/1cWivDq387P2BxHgGfJMi94uAkvl3Nx86sQAYdZ9TVV0/edit?usp=sharing',
+  '聖戦士': 'https://docs.google.com/document/d/1Q7vviVF6OgtwCfCW0CcNiWNPgPeFDa_cq5K62PMwmDA/edit?usp=sharing',
+  '兵士': 'https://docs.google.com/document/d/1s_Rchh1O3lQGVc4fX5t9lmQCdDSCH0N4zxIcm7plTGg/edit?usp=sharing',
+  '魔道士': 'https://docs.google.com/document/d/1v5ePCD1Dmab_T1lgMOinCB1qSvWQQ1JftG_yQydiIe0/edit?usp=sharing',
+};
 
 // avatarフォルダのPNGを参照（差し替え可能）。読み込み失敗時は絵文字にフォールバック
 function iconImg(t, cls){
@@ -533,7 +551,11 @@ function renderMasterTraits(t){
   if(m.partnership) html += `<div class="mt-section"><div class="mt-title">${m.partnership.t}</div>${traitList(m.partnership.items)}${m.partnership.ng ? `<div class="mt-value-d" style="margin-top:6px">NG例：${m.partnership.ng}</div>` : ''}</div>`;
   if(m.okWords) html += `<div class="mt-section"><div class="mt-title">💚 刺さるOKワード</div>${traitWordBlock(m.okWords)}</div>`;
   if(m.ngWords) html += `<div class="mt-section"><div class="mt-title">🚫 避けたいNGワード</div>${traitWordBlock(m.ngWords)}</div>`;
-  html += `<div class="mt-source">${MASTER_SOURCE}</div></div>`;
+  const docUrl = SOURCE_DOC_URLS[t.code];
+  const docLink = docUrl
+    ? ` ／ <a href="${docUrl}" target="_blank" rel="noopener">${t.code}タイプ資料</a>`
+    : ` ／ ${t.code}タイプ資料（準備中）`;
+  html += `<div class="mt-source">${MASTER_SOURCE}${docLink}</div></div>`;
   return html;
 }
 function closeDetail(){
