@@ -130,6 +130,8 @@ body{font-family:'Yu Gothic UI','Hiragino Sans','Meiryo',sans-serif;
   padding-bottom:3px;border-bottom:1px solid #2a2a4a}
 .art-body p:first-child{margin-top:0}
 .source-tag{font-size:9.5px;color:var(--muted);text-align:right;margin-top:12px}
+.source-tag a{color:var(--muted);text-decoration:underline}
+.source-tag a:hover{color:var(--gold)}
 
 .missing{background:var(--card);border:2px solid var(--red);border-radius:16px;
   padding:20px;text-align:center}
@@ -251,6 +253,23 @@ const TYPES = [
 ];
 const ICON_BY_NAME = Object.fromEntries(TYPES.map(t=>[t.code,t.icon]));
 const TYPE_BY_NAME = Object.fromEntries(TYPES.map(t=>[t.code,t]));
+
+// 継承マスター資料（源流ドキュメント）へのリンク。シスター・姫・狂戦士は資料未着手のため未登録
+const SOURCE_DOC_URLS = {
+  '妖精': 'https://docs.google.com/document/d/1T2NTNx_eqcodWsTQq36lzT29p8OQo6V6M537Xz7txdo/edit?hl=ja&tab=t.0',
+  '牧師': 'https://docs.google.com/document/d/1hJBIvL84lfE9J955hsI3eiOH4e0tUprt1toqL2JbGMU/edit?tab=t.0',
+  '賢者': 'https://docs.google.com/document/d/1GhOvevp5wCXQ-PUqISENioP1VaV-kUj62PLq7rhs9wc/edit?tab=t.0',
+  '占い師': 'https://docs.google.com/document/d/1rPnt2PBYnOCfDR30AYYn3DA5bSEeaoZ_mHN9uU0zGMs/edit?tab=t.0',
+  '騎士': 'https://docs.google.com/document/d/1yJpD2tj1eo5prC8Nj2NAtYRlb2r3vvcBFCdZzzhO58U/edit?tab=t.0',
+  '勇者': 'https://docs.google.com/document/d/16sM0V8PGAWAzXiDZ_TYNmesOG6CMMBvHBUeK6NB9CD4/edit?usp=sharing',
+  '盗賊': 'https://docs.google.com/document/d/1_RGHIKus88p9VhpX8Z6T411aaQO5AOEq8ddFnfP7P2s/edit?usp=sharing',
+  '道化師': 'https://docs.google.com/document/d/10HwWXU4yII6Ki6CiZ5tRIvI72mFc0HQTUfUp0NBw1oc/edit?usp=sharing',
+  '忍者': 'https://docs.google.com/document/d/1Ecf5KJ9c5FZOg9U-o9WmTTwNgR_JHKPl9L1StFtlSbg/edit?usp=sharing',
+  '魔法戦士': 'https://docs.google.com/document/d/1cWivDq387P2BxHgGfJMi94uAkvl3Nx86sQAYdZ9TVV0/edit?usp=sharing',
+  '聖戦士': 'https://docs.google.com/document/d/1Q7vviVF6OgtwCfCW0CcNiWNPgPeFDa_cq5K62PMwmDA/edit?usp=sharing',
+  '兵士': 'https://docs.google.com/document/d/1s_Rchh1O3lQGVc4fX5t9lmQCdDSCH0N4zxIcm7plTGg/edit?usp=sharing',
+  '魔道士': 'https://docs.google.com/document/d/1v5ePCD1Dmab_T1lgMOinCB1qSvWQQ1JftG_yQydiIe0/edit?usp=sharing',
+};
 
 // avatarフォルダのPNGを参照（差し替え可能）。読み込み失敗時は絵文字にフォールバック
 function iconImg(t, cls){
@@ -450,7 +469,16 @@ function showEntry(){
   document.getElementById('artTitle').textContent = `${entry.typeA} × ${entry.typeB}`;
   const { html, headings } = renderContent(entry.content);
   document.getElementById('artBody').innerHTML = html;
-  document.getElementById('artSource').textContent = `出典: 恋愛式学 継承マスター資料（${entry.source}）`;
+  {
+    const srcEl = document.getElementById('artSource');
+    const links = [entry.typeA, entry.typeB]
+      .filter((code, i, arr) => arr.indexOf(code) === i) // 同タイプ同士(狂戦士×狂戦士等)は重複除去
+      .map(code => SOURCE_DOC_URLS[code]
+        ? `<a href="${SOURCE_DOC_URLS[code]}" target="_blank" rel="noopener">${code}タイプ資料</a>`
+        : `${code}タイプ資料（準備中）`)
+      .join(' ／ ');
+    srcEl.innerHTML = `出典: 恋愛式学 継承マスター資料（${entry.source}） ／ ${links}`;
+  }
   renderSubToc(headings);
   document.getElementById('article').scrollIntoView({behavior:'smooth', block:'start'});
 }
