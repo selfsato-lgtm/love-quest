@@ -503,7 +503,7 @@ const RADAR_AXES = ['社交性','行動力','思考力','メンタル力','協�
 // 16タイプ＝主(60%)+副(40%)のブレンドで算出。狂戦士/姫/魔道士/シスターは基礎タイプそのまま（純粋な組み合わせ）
 const RADAR_STATS = {
   '狂戦士':  [60,85,75,90,15,55],
-  '勇者':    [95,75,55,70,50,85],
+  '勇者':    [90,90,65,85,55,85],
   '魔法戦士':[65,90,75,75,15,55],
   '聖戦士':  [90,65,70,90,55,70],
   '騎士':    [90,85,75,85,75,85],
@@ -529,11 +529,15 @@ function renderRadar(code){
   };
   const rings = [0.2,0.4,0.6,0.8,1.0].map(f=>{
     const p = RADAR_AXES.map((_,i)=>pt(i, R*f).join(',')).join(' ');
-    return `<polygon points="${p}" fill="none" stroke="#3a3a5a" stroke-width="1"/>`;
+    return `<polygon points="${p}" fill="none" stroke="#4a4a6a" stroke-width="1"/>`;
   }).join('');
   const spokes = RADAR_AXES.map((_,i)=>{
     const [x,y] = pt(i,R);
-    return `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#3a3a5a" stroke-width="1"/>`;
+    return `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#4a4a6a" stroke-width="1"/>`;
+  }).join('');
+  const ticks = [20,40,60,80,100].map(v=>{
+    const y = cy - R*(v/100);
+    return `<text x="${cx+3}" y="${y+3}" font-size="9" fill="#8888a8">${v}</text>`;
   }).join('');
   const shapePts = vals.map((v,i)=>pt(i, R*(v/100)).join(',')).join(' ');
   const labels = RADAR_AXES.map((label,i)=>{
@@ -541,8 +545,8 @@ function renderRadar(code){
     return `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#b8b8d0">${label}</text>`;
   }).join('');
   return `<div class="radar-wrap"><svg viewBox="0 0 200 200">
-    ${rings}${spokes}
-    <polygon points="${shapePts}" fill="var(--gold)" fill-opacity="0.32" stroke="var(--gold)" stroke-width="2"/>
+    ${rings}${spokes}${ticks}
+    <polygon points="${shapePts}" fill="var(--gold)" fill-opacity="0.5" stroke="var(--gold)" stroke-width="2.5"/>
     ${labels}
   </svg><div class="radar-note">継承マスター資料の「タイプのエネルギー」より</div></div>`;
 }
