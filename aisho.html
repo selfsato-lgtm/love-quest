@@ -404,7 +404,7 @@ function renderStyleCard(mM,mS,mSt,yM,yS,ySt){
       <h3>🧬 表現スタイル(恋愛式学64分類)</h3>
       ${mVar? `<div class="dir me"><div class="dirhd">🙋 自分 ${mSt}(${EXPRESSION_STYLES[mSt].axis})</div><div class="dirtx">${mVar}</div></div>` : ""}
       ${yVar? `<div class="dir you"><div class="dirhd">💗 相手 ${ySt}(${EXPRESSION_STYLES[ySt].axis})</div><div class="dirtx">${yVar}</div></div>` : ""}
-      ${note? `<div class="tagline">💡 ${note}</div>` : `<div class="tagline">💡 両方選ぶと、表現スタイルの噛み合わせコメントも表示されます。</div>`}
+      ${note? `<div class="tagline">💡 <b>(資料外・独自の補足コメント)</b> ${note}</div>` : `<div class="tagline">💡 両方選ぶと、表現スタイルの噛み合わせコメントも表示されます。</div>`}
     </div>`;
 }
 // 16タイプ早見表: 行タップで詳細を開閉
