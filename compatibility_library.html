@@ -157,7 +157,7 @@ body{font-family:'Yu Gothic UI','Hiragino Sans','Meiryo',sans-serif;
   <div class="topbar">
     <div class="hdr-side left">
       <button class="hamburger" onclick="toggleSidebar()">☰</button>
-      <a class="portal-back" href="index.html">← <span class="pb-txt">ポータルへ戻る</span></a>
+      <a class="portal-back" href="index.html" onclick="location.href='index.html?t='+Date.now();return false;">← <span class="pb-txt">ポータルへ戻る</span></a>
     </div>
     <button class="home-link" onclick="goHome()" title="TOPに戻る">
       <div class="avatar" id="topAvatar">🔮</div>
